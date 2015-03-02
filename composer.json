@@ -23,7 +23,7 @@
 		]
 	},
     "name": "studioforty9/qa",
-    "require-dev": {
+    "require": {
         "behat/mink-selenium2-driver": "*",
         "magento-ecg/coding-standard": "dev-master",
         "magento-hackathon/magento-composer-installer": "*",
