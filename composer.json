@@ -27,7 +27,7 @@
     ],
     "require": {
         "behat/mink-selenium2-driver": "*",
-        "magetest/magento-behat-extension": "dev-develop"
+        "magetest/magento-behat-extension": "dev-master"
     },
     "version": "0.0.1"
 }
