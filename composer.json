@@ -19,12 +19,14 @@
         {
             "type": "composer",
             "url": "http://packages.firegento.com"
+        },
+        {
+            "type": "vcs",
+            "url": "https://github.com/magento-ecg/coding-standard"
         }
     ],
     "require": {
         "behat/mink-selenium2-driver": "*",
-        "magento-ecg/coding-standard": "dev-master",
-        "magetest/magento-behat-extension": "dev-develop"
     },
     "version": "0.0.1"
 }
