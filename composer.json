@@ -20,15 +20,15 @@
                 "features/",
                 "features/"
             ]
-		]
-	},
+        ]
+    },
     "name": "studioforty9/qa",
     "repositories": [
         {
-            "type": "vcs",
-            "url": "https://github.com/magento-ecg/coding-standard"
+            "type": "composer",
+            "url": "http://packages.firegento.com"
         }
-	],
+    ],
     "require": {
         "behat/mink-selenium2-driver": "*",
         "magento-ecg/coding-standard": "*",
