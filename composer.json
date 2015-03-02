@@ -1,0 +1,26 @@
+{
+    "autoload": {
+        "psr-0": {
+            "": [
+                "./app",
+                "./app/code/local",
+                "./app/code/community",
+                "./app/code/core",
+                "./lib"
+            ]
+        }
+    },
+    "config": {
+        "bin-dir": "bin"
+    },
+    "description": "StudioForty9 Quality Assurance module",
+    "name": "studioforty9/qa",
+    "require-dev": {
+        "behat/mink-selenium2-driver": "*",
+        "magento-ecg/coding-standard": "dev-master",
+        "magento-hackathon/magento-composer-installer": "*",
+        "magetest/magento-behat-extension": "dev-develop"
+    },
+    "type": "magento-module",
+    "version": "0.0.1"
+}
