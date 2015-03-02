@@ -31,7 +31,7 @@
 	],
     "require": {
         "behat/mink-selenium2-driver": "*",
-        "magento-ecg/coding-standard": "dev-master",
+        "magento-ecg/coding-standard": "*",
         "magento-hackathon/magento-composer-installer": "*",
         "magetest/magento-behat-extension": "dev-develop"
     },
