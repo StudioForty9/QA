@@ -13,8 +13,14 @@
         ]
     },
     "name": "studioforty9/qa",
+    "repositories": [
+        {
+            "type": "composer",
+            "url": "http://packages.firegento.com"
+        }
+    ],
     "require": {
-        "magento-hackathon/magento-composer-installer": "*"
+        "magento-hackathon/magento-composer-installer": "dev-master"
     },
     "type": "magento-module",
     "version": "0.0.1"
