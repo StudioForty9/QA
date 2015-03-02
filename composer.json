@@ -26,7 +26,7 @@
         }
     ],
     "require": {
-        "behat/mink-selenium2-driver": "*",
+        "behat/mink-selenium2-driver": "*"
     },
     "version": "0.0.1"
 }
