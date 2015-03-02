@@ -1,0 +1,3 @@
+Feature: Checkout
+
+  Scenario: Checkout

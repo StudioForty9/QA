@@ -1,0 +1,3 @@
+Feature: Admin
+
+  Scenario: Admin
