@@ -3,6 +3,7 @@ default:
         name: progress
     extensions:
         MageTest\MagentoExtension\Extension: ~
+        StudioForty9\QA\Extension: ~
         Behat\MinkExtension\Extension:
             base_url: %magento.base_url%
             goutte:
@@ -10,5 +11,5 @@ default:
                     HTTP_HOST: %magento.base_url%
             selenium2:
                 wd_host: "http://localhost:8643/wd/hub"
-            default_session: selenium2
+            default_session: goutte
             javascript_session: selenium2

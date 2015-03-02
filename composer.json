@@ -1,4 +1,16 @@
 {
+    "autoload": {
+        "psr-0": {
+            "": [
+                "vendor/studioforty/qa/src/app",
+                "vendor/studioforty/qa/src/lib",
+                "vendor/studioforty/qa/src/app/code/local",
+                "vendor/studioforty/qa/src/app/code/community",
+                "vendor/studioforty/qa/src/app/code/core"
+            ],
+            "StudioForty9": "src/"
+        }
+    },
     "description": "StudioForty9 Quality Assurance module",
     "extra": {
         "map": [
