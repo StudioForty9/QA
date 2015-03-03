@@ -1,0 +1,8 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="Homepage" type="PhpBehatConfigurationType" factoryName="Behat">
+    <BehatRunner directory="$PROJECT_DIR$/features" file="$PROJECT_DIR$/features/homepage.feature" scenario="" scope="File" />
+    <RunnerSettings RunnerId="PhpRunner" />
+    <ConfigurationWrapper RunnerId="PhpRunner" />
+    <method />
+  </configuration>
+</component>

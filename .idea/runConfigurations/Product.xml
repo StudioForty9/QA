@@ -1,0 +1,6 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="Product" type="PhpBehatConfigurationType" factoryName="Behat">
+    <BehatRunner directory="$PROJECT_DIR$/features" file="$PROJECT_DIR$/features/product.feature" scenario="" scope="File" />
+    <method />
+  </configuration>
+</component>
