@@ -1,4 +1,9 @@
 Feature: Homepage
 
+  @now
   Scenario: Homepage
     Given I am on "/"
+    Then I should see the logo
+    And I should see a search box
+    And I should see the navigation
+    And I should see the footer

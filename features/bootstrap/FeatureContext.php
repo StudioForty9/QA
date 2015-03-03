@@ -27,18 +27,20 @@ class FeatureContext extends \Behat\MinkExtension\Context\MinkContext
      */
     public function __construct(array $parameters)
     {
-        // Initialize your context here
+		$subcontexts = array(
+			'admin',
+            'cart',
+            'category',
+            'checkout',
+            'custom',
+            'customer',
+            'homepage',
+            'product',
+		);
+		foreach($subcontexts as $pageType){
+			$className = uc_words($pageType) . 'Context';
+			$subcontext = new $className();
+			$this->useContext($pageType, $subcontext);
+		}
     }
-
-//
-// Place your definition and hook methods here:
-//
-//    /**
-//     * @Given /^I have done something with "([^"]*)"$/
-//     */
-//    public function iHaveDoneSomethingWith($argument)
-//    {
-//        doSomethingWith($argument);
-//    }
-//
 }

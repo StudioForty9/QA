@@ -1,3 +1,0 @@
-Feature: GeoIP
-
-  Scenario: GeoIP
