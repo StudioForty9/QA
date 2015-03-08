@@ -1,18 +1,31 @@
 <?php
 
 use Behat\Behat\Exception\PendingException;
+use Behat\Behat\Context\BehatContext;
 
 /**
  * Homepage context.
  */
-class HomepageContext extends \Behat\MinkExtension\Context\RawMinkContext
+class HomepageContext extends BehatContext
 {
+//    public function getSession($name = null)
+//    {
+//        return $this->getMainContext()->getSession($name);
+//    }
+
+    public function assertSession()
+    {
+        return $this->getMainContext()->assertSession();
+    }
+
     /**
      * @Then /^I should see the logo$/
      */
     public function iShouldSeeTheLogo()
     {
-        throw new PendingException();
+        //FIXME
+        //$this->assertSession()->elementExists('css', '.logo');
+        $this->assertSession()->elementExists('css', '#logo');
     }
 
     /**
@@ -20,7 +33,7 @@ class HomepageContext extends \Behat\MinkExtension\Context\RawMinkContext
      */
     public function iShouldSeeASearchBox()
     {
-        throw new PendingException();
+        $this->assertSession()->elementExists('css', '#search_mini_form');
     }
 
     /**
@@ -28,7 +41,8 @@ class HomepageContext extends \Behat\MinkExtension\Context\RawMinkContext
      */
     public function iShouldSeeTheNavigation()
     {
-        throw new PendingException();
+        //$this->assertSession()->elementExists('css', '#nav');
+        $this->assertSession()->elementExists('css', '#top-navigation');
     }
 
     /**
@@ -36,6 +50,7 @@ class HomepageContext extends \Behat\MinkExtension\Context\RawMinkContext
      */
     public function iShouldSeeTheFooter()
     {
-        throw new PendingException();
+        //$this->assertSession()->elementExists('css', '.footer');
+        $this->assertSession()->elementExists('css', '#footer');
     }
 }

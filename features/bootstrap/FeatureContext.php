@@ -43,4 +43,12 @@ class FeatureContext extends \Behat\MinkExtension\Context\MinkContext
 			$this->useContext($pageType, $subcontext);
 		}
     }
+
+    /**
+     * @Given /^I wait for "([^"]*)" Seconds$/
+     */
+    public function iWaitForSeconds($arg)
+    {
+        sleep($arg);
+    }
 }
