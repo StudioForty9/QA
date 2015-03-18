@@ -5,7 +5,7 @@ use Behat\Behat\Context\Step;
 /**
  * Category context.
  */
-class ProductContext extends AbstractContext
+class ProductContext extends MagentoProjectContext
 {
     protected $_product = null;
 

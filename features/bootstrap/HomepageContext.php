@@ -6,7 +6,7 @@ use Behat\Behat\Context\BehatContext;
 /**
  * Homepage context.
  */
-class HomepageContext extends BehatContext
+class HomepageContext extends MagentoProjectContext
 {
 //    public function getSession($name = null)
 //    {

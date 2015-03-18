@@ -6,7 +6,7 @@ use Behat\Behat\Context\Step;
 /**
  * Category context.
  */
-class CategoryContext extends BehatContext
+class CategoryContext extends MagentoProjectContext
 {
     protected $_category = null;
 

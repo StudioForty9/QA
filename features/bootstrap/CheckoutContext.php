@@ -6,7 +6,7 @@ use Behat\Behat\Context\Step;
 /**
  * Checkout context.
  */
-class CheckoutContext extends AbstractContext
+class CheckoutContext extends MagentoProjectContext
 {
     /**
      * @When /^I add a product to the cart$/
