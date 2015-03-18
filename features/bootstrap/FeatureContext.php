@@ -37,6 +37,10 @@ class FeatureContext extends \Behat\MinkExtension\Context\MinkContext
             'homepage',
             'product',
 		);
+		
+		$customContexts = $parameters['custom_contexts'];
+        $subcontexts = array_merge($subcontexts, $customContexts);
+		
 		foreach($subcontexts as $pageType){
 			$className = uc_words($pageType) . 'Context';
 			$subcontext = new $className();

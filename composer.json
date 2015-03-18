@@ -23,8 +23,8 @@
                 "features/"
             ],
             [
-                "behat.yml",
-                "behat.yml"
+                "behat.yml.sample",
+                "behat.yml.sample"
             ]
         ]
     },
