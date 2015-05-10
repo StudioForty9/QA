@@ -19,6 +19,8 @@ use Behat\Gherkin\Node\PyStringNode,
  */
 class FeatureContext extends \Behat\MinkExtension\Context\MinkContext
 {
+    private $_params = array();
+
     /**
      * Initializes context.
      * Every scenario gets it's own context object.
@@ -27,6 +29,8 @@ class FeatureContext extends \Behat\MinkExtension\Context\MinkContext
      */
     public function __construct(array $parameters)
     {
+        $this->_params = $parameters;
+
 		$subcontexts = array(
 			'admin',
             'cart',
@@ -38,9 +42,9 @@ class FeatureContext extends \Behat\MinkExtension\Context\MinkContext
             'product',
 		);
 		
-		$customContexts = $parameters['custom_contexts'];
+		$customContexts = isset($parameters['custom_contexts']) ? $parameters['custom_contexts'] : array();
         $subcontexts = array_merge($subcontexts, $customContexts);
-		
+
 		foreach($subcontexts as $pageType){
 			$className = uc_words($pageType) . 'Context';
 			$subcontext = new $className();
@@ -54,5 +58,14 @@ class FeatureContext extends \Behat\MinkExtension\Context\MinkContext
     public function iWaitForSeconds($arg)
     {
         sleep($arg);
+    }
+
+    public function getParameters()
+    {
+        return $this->_params;
+    }
+
+    public function getParameter($key){
+        return $this->_params[$key];
     }
 }

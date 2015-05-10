@@ -10,6 +10,13 @@ default:
                 server_parameters:
                     HTTP_HOST: %magento.base_url%
             selenium2:
+                #wd_host: "http://localhost:4445/wd/hub"
                 wd_host: "http://localhost:8643/wd/hub"
+                browser: chrome
             default_session: goutte
             javascript_session: selenium2
+    filters:
+        #tags: @done
+    context:
+        parameters:
+            theme: rwd

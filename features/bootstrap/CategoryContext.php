@@ -10,23 +10,6 @@ class CategoryContext extends MagentoProjectContext
 {
     protected $_category = null;
 
-    /**
-     * @param null $name
-     * @return Behat\Mink\Session
-     */
-    public function getSession($name = null)
-    {
-        return $this->getMainContext()->getSession($name);
-    }
-
-    /**
-     * @return Behat\Mink\WebAssert
-     */
-    public function assertSession()
-    {
-        return $this->getMainContext()->assertSession();
-    }
-
     public function __construct()
     {
         $store = Mage::app()->getStore()->getId();
@@ -57,7 +40,6 @@ class CategoryContext extends MagentoProjectContext
     {
         $url = Mage::getBaseUrl() . 'catalog/category/view/id/' . $this->_category->getId();
         $this->getSession()->visit($url);
-        $this->assertSession()->statusCodeEquals(200);
     }
 
     /**
@@ -75,7 +57,8 @@ class CategoryContext extends MagentoProjectContext
      */
     public function iShouldSeeTheBreadcrumbs()
     {
-        $this->assertSession()->elementExists('css', '.breadcrumb');
+        $className = $this->getClassNameByTheme('breadcrumbs');
+        $this->assertSession()->elementExists('css', $className);
     }
 
     /**
@@ -91,8 +74,6 @@ class CategoryContext extends MagentoProjectContext
      */
     public function eachProductShouldHaveAPrice()
     {
-        //FIXME
-        return true;
         $this->assertSession()->elementExists('css', '.price-box');
     }
 
@@ -101,9 +82,9 @@ class CategoryContext extends MagentoProjectContext
      */
     public function iClickOnAProduct()
     {
-        $link = $this->getSession()->getPage()->find('css', 'h2.product-title a');
+        $className = $this->getClassNameByTheme('productNameOnCategoryPage');
+        $link = $this->getSession()->getPage()->find('css', $className);
         $this->getSession()->visit($link->getAttribute('href'));
-        $this->assertSession()->statusCodeEquals(200);
     }
 
     /**
@@ -112,5 +93,83 @@ class CategoryContext extends MagentoProjectContext
     public function iShouldBeOnAProductPage()
     {
         $this->assertSession()->elementExists('css', 'body.catalog-product-view');
+    }
+
+    /**
+     * @When /^I click on the add to cart button of a product$/
+     */
+    public function iClickOnTheAddToCartButtonOfAProduct()
+    {
+        return array(
+            new Step\When('I press "Add to Cart"')
+        );
+    }
+
+    /**
+     * @Then /^I can change what attribue to sort by$/
+     */
+    public function iCanChangeWhatAttribueToSortBy()
+    {
+        $select = $this->getSession()->getPage()->find("css", ".sort-by select");
+        $option = $this->getSession()->getPage()->find("css", ".sort-by option[text=\"Name\"]");
+        $select->selectOption($option, false);
+    }
+
+    /**
+     * @Given /^I can change the sort direction$/
+     */
+    public function iCanChangeTheSortDirection()
+    {
+        return array(
+            new Step\When('I follow "Set Descending Direction"')
+        );
+    }
+
+    /**
+     * @Given /^I can paginate forwards through the list of results$/
+     */
+    public function iCanPaginateForwardsThroughTheListOfResults()
+    {
+        return true;
+        throw new PendingException();
+    }
+
+    /**
+     * @Given /^I can paginate backwards through the list of results$/
+     */
+    public function iCanPaginateBackwardsThroughTheListOfResults()
+    {
+        return true;
+        throw new PendingException();
+    }
+
+    /**
+     * @Given /^I can change the number of products to show per page$/
+     */
+    public function iCanChangeTheNumberOfProductsToShowPerPage()
+    {
+        $select = $this->getSession()->getPage()->find("css", ".limiter select");
+        $option = $this->getSession()->getPage()->find("css", ".limiter option[text=\"24\"]");
+        $select->selectOption($option, false);
+    }
+
+    /**
+     * @Given /^I can change to a grid view$/
+     */
+    public function iCanChangeToAGridView()
+    {
+        return array(
+            new Step\When('I follow "Grid"')
+        );
+    }
+
+    /**
+     * @Given /^I can change to a list view$/
+     */
+    public function iCanChangeToAListView()
+    {
+        return array(
+            new Step\When('I follow "List"')
+        );
     }
 }

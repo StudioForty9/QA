@@ -8,11 +8,6 @@ use Behat\Behat\Context\BehatContext;
  */
 class HomepageContext extends MagentoProjectContext
 {
-//    public function getSession($name = null)
-//    {
-//        return $this->getMainContext()->getSession($name);
-//    }
-
     public function assertSession()
     {
         return $this->getMainContext()->assertSession();
@@ -23,9 +18,7 @@ class HomepageContext extends MagentoProjectContext
      */
     public function iShouldSeeTheLogo()
     {
-        //FIXME
-        //$this->assertSession()->elementExists('css', '.logo');
-        $this->assertSession()->elementExists('css', '#logo');
+        $this->assertSession()->elementExists('css', '.logo');
     }
 
     /**
@@ -41,8 +34,7 @@ class HomepageContext extends MagentoProjectContext
      */
     public function iShouldSeeTheNavigation()
     {
-        //$this->assertSession()->elementExists('css', '#nav');
-        $this->assertSession()->elementExists('css', '#top-navigation');
+        $this->assertSession()->elementExists('css', '#nav');
     }
 
     /**
@@ -50,7 +42,6 @@ class HomepageContext extends MagentoProjectContext
      */
     public function iShouldSeeTheFooter()
     {
-        //$this->assertSession()->elementExists('css', '.footer');
-        $this->assertSession()->elementExists('css', '#footer');
+        $this->assertSession()->elementExists('css', '.footer');
     }
 }

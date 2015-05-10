@@ -1,5 +1,6 @@
 Feature: Category
 
+  @category
   Scenario: Category
     Given I am on a category page
     Then I should see the category name
@@ -7,23 +8,26 @@ Feature: Category
     And I should see a list of products
     And each product should have a price
 
+  @category
   Scenario: Go to Product Page
     Given I am on a category page
     When I click on a product
     Then I should be on a product page
 
-#  Scenario: Add to Cart
-#    Given I am on a category page
-#    When I click on the add to cart button of a product
-#    Then I should be on the cart page
-#    And I should see a success message
+  @category @javascript
+  Scenario: Add to Cart
+    Given I am on a category page
+    When I click on the add to cart button of a product
+    Then I should be on the cart page
+    And I should see a success message
 
-#  Scenario: Toolbar
-#    Given I am on a category page
-    #change sort attribute
-    #change sort direction
-    #pagination number
-    #pagination next
-    #pagination previous
-    #product count per page
-    #grid / list
+  @category @now @javascript
+  Scenario: Toolbar
+    Given I am on a category page
+    Then I can change what attribue to sort by
+    And I can change the sort direction
+    And I can paginate forwards through the list of results
+    And I can paginate backwards through the list of results
+    And I can change the number of products to show per page
+    And I can change to a list view
+    And I can change to a grid view

@@ -1,11 +1,12 @@
 <?php
 
-use Behat\Behat\Context\BehatContext;
+//use Behat\Behat\Context\BehatContext;
+use Behat\MinkExtension\Context\RawMinkContext;
 
 /**
  * Cart context.
  */
-class AbstractContext extends BehatContext
+class AbstractContext extends RawMinkContext
 {
     /**
      * @param null $name
@@ -40,5 +41,20 @@ class AbstractContext extends BehatContext
         $collection->getSelect()->order(new Zend_Db_Expr('RAND()'));
 
         return $collection->getFirstItem();
+    }
+
+    public function getClassNameByTheme($key){
+        $rwd = array(
+            'breadcrumbs' => '.breadcrumbs',
+            'productNameOnCategoryPage' => 'h2.product-name a'
+        );
+
+        $other = array(
+            'breadcrumbs' => '.breadcrumb',
+            'productNameOnCategoryPage' => 'h2.product-title a'
+        );
+
+        $theme = $this->getMainContext()->getParameter('theme') == 'rwd' ? $rwd : $other;
+        return $theme[$key];
     }
 }
