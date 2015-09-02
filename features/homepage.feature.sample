@@ -1,6 +1,5 @@
 Feature: Homepage
 
-  @now
   Scenario: Homepage
     Given I am on "/"
     Then I should see the logo

@@ -21,7 +21,6 @@ class ProductContext extends MagentoProjectContext
     {
         $url = Mage::getBaseUrl() . 'catalog/product/view/id/' . $this->_product->getId();
         $this->getSession()->visit($url);
-        //$this->assertSession()->statusCodeEquals(200);
     }
 
     /**
@@ -29,9 +28,8 @@ class ProductContext extends MagentoProjectContext
      */
     public function iShouldSeeTheProductName()
     {
-        return array(
-            new Step\Then('I should see "' . $this->_product->getName() . '"')
-        );
+        //$this->getMainContext()->assertElementContainsText('h1', $this->_product->getName());
+        $this->getMainContext()->assertPageContainsText($this->_product->getName());
     }
 
     /**
@@ -39,7 +37,7 @@ class ProductContext extends MagentoProjectContext
      */
     public function iShouldSeeAValidProductImage()
     {
-        //FIXME
+        //@TODO
         return true;
     }
 
@@ -56,14 +54,7 @@ class ProductContext extends MagentoProjectContext
      */
     public function iShouldBeOnTheCartPage()
     {
-        $this->assertSession()->addressEquals(Mage::getBaseUrl() . 'checkout/cart/');
-    }
-
-    /**
-     * @Given /^I should see a success message$/
-     */
-    public function iShouldSeeASuccessMessage()
-    {
-        $this->assertSession()->elementExists('css', '.success-msg');
+        assertNotNull($this->find('xpath','//h1[contains(., "Shopping Cart")]'));
+        $this->getMainContext()->assertPageAddress('/checkout/cart/');
     }
 }

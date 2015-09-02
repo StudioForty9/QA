@@ -14,14 +14,14 @@ Feature: Category
     When I click on a product
     Then I should be on a product page
 
-  @category @javascript
+  @category @javascript @disabled
   Scenario: Add to Cart
     Given I am on a category page
     When I click on the add to cart button of a product
     Then I should be on the cart page
     And I should see a success message
 
-  @category @now @javascript
+  @category @javascript
   Scenario: Toolbar
     Given I am on a category page
     Then I can change what attribue to sort by
@@ -29,5 +29,5 @@ Feature: Category
     And I can paginate forwards through the list of results
     And I can paginate backwards through the list of results
     And I can change the number of products to show per page
-    And I can change to a list view
-    And I can change to a grid view
+    # And I can change to a list view
+    # And I can change to a grid view

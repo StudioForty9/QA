@@ -41,7 +41,6 @@ class CustomerContext extends MagentoProjectContext
     {
         $url = Mage::getBaseUrl() . 'customer/account/login';
         $this->getSession()->visit($url);
-        //$this->assertSession()->statusCodeEquals(200);
     }
 
     /**
@@ -50,10 +49,9 @@ class CustomerContext extends MagentoProjectContext
     public function iEnterMyUsernameAndPassword()
     {
         $date = date('Ymd');
-        return array(
-            new Step\When('I fill in "Email Address" with "behat-' . $date . '@sf9.ie"'),
-            new Step\When('I fill in "Password" with "password"'),
-        );
+        $context = $this->getMainContext();
+        $context->fillField('Email Address', "behat-$date@sf9.ie");
+        $context->fillField('Password', 'password');
     }
 
     /**
@@ -61,9 +59,8 @@ class CustomerContext extends MagentoProjectContext
      */
     public function iShouldByOnTheMyAccountPage()
     {
-        return array(
-            new Step\Then('I should be on "/customer/account/"')
-        );
+        assertNotNull($this->find('xpath','//h1[contains(., "My Dashboard")]'));
+        $this->getMainContext()->assertPageAddress('/customer/account/');
     }
 
     /**
@@ -74,12 +71,12 @@ class CustomerContext extends MagentoProjectContext
         $this->iGoToTheCustomerLoginPage();
         $date = date('Ymd');
 
-        return array(
-            new Step\When('I fill in "Email Address" with "behat-' . $date . '@sf9.ie"'),
-            new Step\When('I fill in "Password" with "password"'),
-            new Step\When('I press "Login"'),
-            new Step\When('I wait for "5" Seconds')
-        );
+        /* @var $context Behat\MinkExtension\Context\MinkContext */
+        $context = $this->getMainContext();
+        $context->fillField('Email Address', "behat-$date@sf9.ie");
+        $context->fillField('Password', 'password');
+        $context->pressButton('Login');
+        assertNotNull($this->find('xpath','//h1[contains(., "My Dashboard")]'));
     }
 
     /**
@@ -87,31 +84,7 @@ class CustomerContext extends MagentoProjectContext
      */
     public function iClickOn($arg1)
     {
-        return array(
-            new Step\When('I follow "' . $arg1 . '"')
-        );
-    }
-
-    /**
-     * @AfterScenario
-     */
-    public function takeScreenshotForFailedScenario($event)
-    {
-        if ($event->getResult() === 4) {
-            Mage::log($event->getScenario()->getTitle(), null, 'behat.log', true);
-            Mage::log($this->getSession()->getCurrentUrl(), null, 'behat.log', true);
-
-            $driver = $this->getSession()->getDriver();
-            if (get_class($driver) == 'Behat\\Mink\\Driver\\Selenium2Driver') {
-                try{
-                    //Mage::helper('sf9_core')->getSlug($event->getScenario()->getTitle()
-                    $date = date('Ymdhis');
-                    $this->saveScreenshot($date . '.png',
-                        Mage::getBaseDir() . '/var/screenshots');
-                }catch(Exception $e){
-                    Mage::log($e->getMessage(), null, 'behat.log', true);
-                }
-            }
-        }
+        $this->getSession()->getPage()->clickLink($arg1);
+        assertNotNull($this->find('xpath','//h1[contains(., "' . $arg1 . '")]'));
     }
 }

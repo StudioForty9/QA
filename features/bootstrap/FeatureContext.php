@@ -1,19 +1,5 @@
 <?php
 
-use Behat\Behat\Context\ClosuredContextInterface,
-    Behat\Behat\Context\TranslatedContextInterface,
-    Behat\Behat\Context\BehatContext,
-    Behat\Behat\Exception\PendingException;
-use Behat\Gherkin\Node\PyStringNode,
-    Behat\Gherkin\Node\TableNode;
-
-//
-// Require 3rd-party libraries here:
-//
-//   require_once 'PHPUnit/Autoload.php';
-//   require_once 'PHPUnit/Framework/Assert/Functions.php';
-//
-
 /**
  * Features context.
  */
@@ -53,11 +39,19 @@ class FeatureContext extends \Behat\MinkExtension\Context\MinkContext
     }
 
     /**
-     * @Given /^I wait for "([^"]*)" Seconds$/
+     * @Then /^I should see a success message$/
      */
-    public function iWaitForSeconds($arg)
+    public function iShouldSeeASuccessMessage()
     {
-        sleep($arg);
+        $this->assertElementOnPage('.success-msg');
+    }
+
+    /**
+     * @Then /^I should see an error message$/
+     */
+    public function iShouldSeeAnErrorMessage()
+    {
+        $this->assertElementOnPage('.error-msg');
     }
 
     public function getParameters()

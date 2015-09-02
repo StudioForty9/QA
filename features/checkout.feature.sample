@@ -1,15 +1,58 @@
 Feature: Checkout
 
-  Scenario: Checkout
+  @checkout @javascript
+  Scenario: Checkout as Guest
     When I add a product to the cart
     And I go to the checkout
+    And I choose Guest Checkout
     And I fill in my Billing Address
-    And I chooose a Shipping Method
+    And I use my Billing Address as my Shipping Address
+    And I choose a Shipping Method
     And I choose Payment Method
+    And I save the Payment Method
     And I press "Place Order"
-    Then I should be on "/checkout/onepage/success"
+    Then I should be on the Success Page
 
-  #checkout as guest
-  #register as part of checkout
-  #login to checkout
-  #different shipping address
+  @checkout @javascript
+  Scenario: Register as Customer
+    When I add a product to the cart
+    And I go to the checkout
+    And I choose Register
+    And I fill in my Billing Address
+    And I fill in a Password
+    And I use my Billing Address as my Shipping Address
+    And I choose a Shipping Method
+    And I choose Payment Method
+    And I save the Payment Method
+    And I press "Place Order"
+    Then I should be on the Success Page
+
+  @checkout @javascript
+  Scenario: Login to Checkout
+    Given I am a registered customer
+    When I add a product to the cart
+    And I go to the checkout
+    And I login to my account
+    And I fill in my Billing Address
+    And I use my Billing Address as my Shipping Address
+    And I choose a Shipping Method
+    And I choose Payment Method
+    And I save the Payment Method
+    And I press "Place Order"
+    Then I should be on the Success Page
+
+  @checkout @javascript
+  Scenario: Checkout with Different Shipping Address
+    When I add a product to the cart
+    And I go to the checkout
+    And I choose Guest Checkout
+    And I fill in my Billing Address
+    And I enter a different Shipping Address
+    And I choose a Shipping Method
+    And I choose Payment Method
+    And I save the Payment Method
+    And I press "Place Order"
+    Then I should be on the Success Page
+
+  @checkout @javascript @todo
+  Scenario: Checkout with Paypal

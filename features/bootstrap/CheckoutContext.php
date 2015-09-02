@@ -1,6 +1,5 @@
 <?php
 
-use Behat\Behat\Exception\PendingException;
 use Behat\Behat\Context\Step;
 
 /**
@@ -8,20 +7,31 @@ use Behat\Behat\Context\Step;
  */
 class CheckoutContext extends MagentoProjectContext
 {
+    protected $_differentShippingAddress = false;
+
+    /**
+     * @Given /^I add the Product to the Cart$/
+     */
+    public function iAddTheProductToTheCart()
+    {
+        Mage::getSingleton('core/translate')->setLocale('en_IE')->init('frontend', true);
+        $addToCartText = Mage::helper('core')->__('Add to Cart');
+
+        
+        $context = $this->getMainContext();
+        $context->pressButton($addToCartText);
+        assertNotNull($this->find('xpath','//*[@id="shopping-cart-totals-table"]'));
+    }
+
     /**
      * @When /^I add a product to the cart$/
      */
     public function iAddAProductToTheCart()
     {
-//        try {
-            //$product = $this->getRandomProduct();
-        $product = Mage::getModel('catalog/product')->load(68699);
-            $quote = Mage::getSingleton('checkout/session')->getQuote();
-            $quote->addProduct($product, 1);
-            $quote->collectTotals()->save();
-//        }catch(Exception $e){
-//            die(var_dump($product->getId()));
-//        }
+        $product = $this->getRandomProduct();
+        $context = $this->getMainContext();
+        $context->visit('/catalog/product/view/id/' . $product->getId());
+        $this->iAddTheProductToTheCart();
     }
 
     /**
@@ -29,7 +39,47 @@ class CheckoutContext extends MagentoProjectContext
      */
     public function iGoToTheCheckout()
     {
+        assertNotNull($this->find('xpath','//*[@id="shopping-cart-totals-table"]'));
         $this->getSession()->visit(Mage::getBaseUrl() . 'checkout/onepage/');
+    }
+
+    /**
+     * @Given /^I should be on the Checkout$/
+     */
+    public function iShouldBeOnTheCheckout()
+    {
+        assertNotNull($this->find('xpath','//*[@id="checkoutSteps"]'));
+    }
+
+    /**
+     * @Given /^I choose Guest Checkout$/
+     */
+    public function iChooseGuestCheckout()
+    {
+        $this->getSession()->getDriver()->click('//*[@id="login:guest"]');
+        $this->getSession()->getDriver()->click('//button[@onclick="checkout.setMethod();"]');
+    }
+
+    /**
+     * @Given /^I choose Register$/
+     */
+    public function iChooseRegister()
+    {
+        $this->getSession()->getDriver()->click('//*[@id="login:register"]');
+        $this->getSession()->getDriver()->click('//button[@onclick="checkout.setMethod();"]');
+    }
+
+    /**
+     * @Given /^I login to my account$/
+     */
+    public function iLoginToMyAccount()
+    {
+        $date = date('Ymd');
+        
+        $context = $this->getMainContext();
+        $context->fillField('login[username]', "behat-$date@sf9.ie");
+        $context->fillField('login[password]', 'password');
+        $context->pressButton('Login');
     }
 
     /**
@@ -37,31 +87,76 @@ class CheckoutContext extends MagentoProjectContext
      */
     public function iFillInMyBillingAddress()
     {
-        $this->getSession()->executeScript("jQuery('#login\\:guest').attr('checked', 'checked')");
-        $this->getSession()->executeScript("jQuery('#onepage-guest-register-button').click()");
+        assertNotNull($this->find('xpath','//button[@onclick="billing.save()"]'));
+        
+        $context = $this->getMainContext();
+        if($this->getSession()->getPage()->find('xpath', '//*[@id="billing:firstname"]')->isVisible()) {
+            $context->fillField('billing[firstname]', 'John');
+            $context->fillField('billing[lastname]', 'Smith');
 
-        $steps = array(
-            new Step\When('I wait for "5" Seconds'),
-            new Step\When('I fill in "firstname" with "John"'),
-            new Step\When('I fill in "lastname" with "Smith"'),
-            new Step\When('I fill in "email" with "behat@sf9.ie"'),
-            new Step\When('I fill in "street1" with "20a Lower John Street"'),
-            new Step\When('I fill in "city" with "Cork City"'),
-            new Step\When('I select "Ireland" with "Country"'),
-            new Step\When('I fill in "telephone" with "0872251250"')
-        );
+            $timestamp = date('YmdHis');
+            if ($this->getSession()->getPage()->find('xpath', '//*[@id="billing:email"]')) {
+                $context->fillField('billing[email]', "behat$timestamp@sf9.ie");
+            }
 
-        $this->getSession()->getDriver()->click('//button[@onclick="billing.save()"]');
-        $this->getMainContext()->iWaitForSeconds(5);
+            $context->fillField('billing:street1', '20a Lower John Street');
+            $context->fillField('billing[city]', 'Cork City');
+            $context->selectOption('billing[country_id]', 'Ireland');
+            $context->fillField('billing[telephone]', '0872251250');
+        }
     }
 
     /**
-     * @Given /^I chooose a Shipping Method$/
+     * @Given /^I fill in a Password$/
      */
-    public function iChoooseAShippingMethod()
+    public function iFillInAPassword()
     {
+        $context = $this->getMainContext();
+        $context->fillField('billing[customer_password]', 'password123');
+        $context->fillField('billing[confirm_password]', 'password123');
+    }
+
+    /**
+     * @Given /^I use my Billing Address as my Shipping Address$/
+     */
+    public function iUseMyBillingAddressAsMyShippingAddress()
+    {
+        $this->getSession()->getDriver()->click('//*[@id="billing:use_for_shipping_yes"]');
+        $this->getSession()->getDriver()->click('//button[@onclick="billing.save()"]');
+    }
+
+    /**
+     * @Given /^I enter a different Shipping Address$/
+     */
+    public function iEnterADifferentShippingAddress()
+    {
+        $this->_differentShippingAddress = true;
+        $this->getSession()->getDriver()->click('//*[@id="billing:use_for_shipping_no"]');
+        $this->getSession()->getDriver()->click('//button[@onclick="billing.save()"]');
+
+        assertNotNull($this->find('xpath','//button[@onclick="shipping.save()"]'));
+
+        $context = $this->getMainContext();
+        $context->fillField('shipping[firstname]', 'Jane');
+        $context->fillField('shipping[lastname]', 'Doe');
+        $context->fillField('shipping:street1', '19 Shop Street');
+        $context->fillField('shipping[city]', 'Galway City');
+        $context->selectOption('shipping[country_id]', 'Ireland');
+        $context->fillField('shipping[telephone]', '0863016163');
+    }
+
+    /**
+     * @Given /^I choose a Shipping Method$/
+     */
+    public function iChooseAShippingMethod()
+    {
+        if($this->_differentShippingAddress){
+            $this->getSession()->getDriver()->click('//button[@onclick="shipping.save()"]');
+        }
+
+        assertNotNull($this->find('xpath','//button[@onclick="shippingMethod.save()"]'));
+        $this->getSession()->getDriver()->click('//*[@name="shipping_method"]');
         $this->getSession()->getDriver()->click('//button[@onclick="shippingMethod.save()"]');
-        $this->getMainContext()->iWaitForSeconds(5);
     }
 
     /**
@@ -69,14 +164,33 @@ class CheckoutContext extends MagentoProjectContext
      */
     public function iChoosePaymentMethod()
     {
-        $steps = array(
-            new Step\When('I select "Visa" with "Credit Card Type"'),
-            new Step\When('I fill in "Credit Card Number" with "4263971921001307"'),
-            new Step\When('I select "10" with "Expiry Month"'),
-            new Step\When('I select "2017" with "Expiry Year"'),
-            new Step\When('I fill in "Card Verification Number" with "333"'),
-        );
+        assertNotNull($this->find('xpath','//button[@onclick="payment.save()"]'));
+        //$this->getSession()->getDriver()->click('//*[@id="p_method_realex"]');
+        $this->getSession()->getDriver()->click('//*[@id="p_method_checkmo"]');
+
+//        $context = $this->getMainContext();
+//        $context->selectOption('Credit Card Type', 'Visa');
+//        $context->fillField('Name as it appears on Credit Card', 'Alan Morkan');
+//        $context->fillField('Name as it appears on Credit Card', '4263971921001307');
+//        $context->selectOption('payment[cc_exp_month]', '10');
+//        $context->selectOption('payment[cc_exp_year]', '2020');
+//        $context->fillField('CVV', '333');
+    }
+
+    /**
+     * @Given /^I save the Payment Method$/
+     */
+    public function iSaveThePaymentMethod()
+    {
         $this->getSession()->getDriver()->click('//button[@onclick="payment.save()"]');
-        $this->getMainContext()->iWaitForSeconds(5);
+        assertNotNull($this->find('xpath','//button[@onclick="review.save();"]'));
+    }
+
+    /**
+     * @Then /^I should be on the Success Page$/
+     */
+    public function iShouldBeOnTheSuccessPage()
+    {
+        assertNotNull($this->find('xpath','//h1[contains(., "Your order has been received.")]'));
     }
 }

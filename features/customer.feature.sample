@@ -1,6 +1,6 @@
 Feature: Customer
 
-  @customer
+  @customer @javascript
   Scenario: Customer Login
     Given I am a registered customer
     When I go to the customer login page
@@ -9,7 +9,7 @@ Feature: Customer
     Then I should by on the My Account page
     And I should see "My Account"
 
-  @customer
+  @customer @javascript
   Scenario: Customer Navigation
     Given I am logged in as a customer
 
@@ -22,9 +22,5 @@ Feature: Customer
     And I should see "Account Information"
 
     When I click on "Address Book"
-    Then I should be on "/customer/address/new/"
+    Then I should be on "/customer/address/"
     And I should see "Add New Address"
-
-    When I click on "Account Dashboard"
-    Then I should be on "/customer/account/"
-    And I should see "My Dashboard"

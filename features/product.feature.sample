@@ -1,5 +1,6 @@
 Feature: Product Page
 
+  @product @javascript
   Scenario: Product Page
     Given I am on a product page
     Then I should see the product name

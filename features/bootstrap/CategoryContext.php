@@ -1,6 +1,5 @@
 <?php
 
-use Behat\Behat\Context\BehatContext;
 use Behat\Behat\Context\Step;
 
 /**
@@ -20,12 +19,16 @@ class CategoryContext extends MagentoProjectContext
             ->load($rootCategoryId)
             ->getPath();
 
+        $products = Mage::getModel('catalog/product')->getCollection();
+
         $collection = Mage::getModel('catalog/category')->setStoreId($store)
             ->getCollection()
             ->addAttributeToSelect(array('is_active', 'url_key', 'name'))
             ->addAttributeToFilter('path', array("like"=>$rootpath."/"."%"))
             ->addAttributeToFilter('is_active', 1)
             ->setPageSize(1);
+
+        $products->addCountToCategories($collection);
 
         $collection->getSelect()->order(new Zend_Db_Expr('RAND()'));
 
@@ -47,9 +50,7 @@ class CategoryContext extends MagentoProjectContext
      */
     public function iShouldSeeTheCategoryName()
     {
-        return array(
-            new Step\Then('I should see "' . $this->_category->getName() . '"')
-        );
+        $this->getMainContext()->assertElementContainsText('h1', $this->_category->getName());
     }
 
     /**
@@ -58,7 +59,7 @@ class CategoryContext extends MagentoProjectContext
     public function iShouldSeeTheBreadcrumbs()
     {
         $className = $this->getClassNameByTheme('breadcrumbs');
-        $this->assertSession()->elementExists('css', $className);
+        $this->getMainContext()->assertElementOnPage($className);
     }
 
     /**
@@ -66,7 +67,7 @@ class CategoryContext extends MagentoProjectContext
      */
     public function iShouldSeeAListOfProducts()
     {
-        $this->assertSession()->elementExists('css', '.category-products');
+        $this->getMainContext()->assertElementOnPage('.category-products');
     }
 
     /**
@@ -74,7 +75,7 @@ class CategoryContext extends MagentoProjectContext
      */
     public function eachProductShouldHaveAPrice()
     {
-        $this->assertSession()->elementExists('css', '.price-box');
+        $this->getMainContext()->assertElementOnPage('.price-box');
     }
 
     /**
@@ -92,7 +93,7 @@ class CategoryContext extends MagentoProjectContext
      */
     public function iShouldBeOnAProductPage()
     {
-        $this->assertSession()->elementExists('css', 'body.catalog-product-view');
+        $this->getMainContext()->assertElementOnPage('body.catalog-product-view');
     }
 
     /**
@@ -100,9 +101,9 @@ class CategoryContext extends MagentoProjectContext
      */
     public function iClickOnTheAddToCartButtonOfAProduct()
     {
-        return array(
-            new Step\When('I press "Add to Cart"')
-        );
+        
+        $context = $this->getMainContext();
+        $context->pressButton('Add to Cart');
     }
 
     /**
@@ -113,6 +114,7 @@ class CategoryContext extends MagentoProjectContext
         $select = $this->getSession()->getPage()->find("css", ".sort-by select");
         $option = $this->getSession()->getPage()->find("css", ".sort-by option[text=\"Name\"]");
         $select->selectOption($option, false);
+        $this->waitForAjax();
     }
 
     /**
@@ -120,9 +122,10 @@ class CategoryContext extends MagentoProjectContext
      */
     public function iCanChangeTheSortDirection()
     {
-        return array(
-            new Step\When('I follow "Set Descending Direction"')
-        );
+        
+        $context = $this->getMainContext();
+        $context->clickLink("Set Descending Direction");
+        $this->waitForAjax();
     }
 
     /**
@@ -130,8 +133,8 @@ class CategoryContext extends MagentoProjectContext
      */
     public function iCanPaginateForwardsThroughTheListOfResults()
     {
+        //@TODO
         return true;
-        throw new PendingException();
     }
 
     /**
@@ -139,8 +142,8 @@ class CategoryContext extends MagentoProjectContext
      */
     public function iCanPaginateBackwardsThroughTheListOfResults()
     {
+        //@TODO
         return true;
-        throw new PendingException();
     }
 
     /**
@@ -151,6 +154,7 @@ class CategoryContext extends MagentoProjectContext
         $select = $this->getSession()->getPage()->find("css", ".limiter select");
         $option = $this->getSession()->getPage()->find("css", ".limiter option[text=\"24\"]");
         $select->selectOption($option, false);
+        $this->waitForAjax();
     }
 
     /**
@@ -158,9 +162,10 @@ class CategoryContext extends MagentoProjectContext
      */
     public function iCanChangeToAGridView()
     {
-        return array(
-            new Step\When('I follow "Grid"')
-        );
+        
+        $context = $this->getMainContext();
+        $context->clickLink("Grid");
+        $this->waitForAjax();
     }
 
     /**
@@ -168,8 +173,14 @@ class CategoryContext extends MagentoProjectContext
      */
     public function iCanChangeToAListView()
     {
-        return array(
-            new Step\When('I follow "List"')
-        );
+        
+        $context = $this->getMainContext();
+        $context->clickLink("List");
+        $this->waitForAjax();
+    }
+
+    public function waitForAjax(){
+        $this->getSession()->wait(10, '(0 === Ajax.activeRequestCount)');
+        sleep(1);
     }
 }

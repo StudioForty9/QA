@@ -8,17 +8,12 @@ use Behat\Behat\Context\BehatContext;
  */
 class HomepageContext extends MagentoProjectContext
 {
-    public function assertSession()
-    {
-        return $this->getMainContext()->assertSession();
-    }
-
     /**
      * @Then /^I should see the logo$/
      */
     public function iShouldSeeTheLogo()
     {
-        $this->assertSession()->elementExists('css', '.logo');
+        $this->getMainContext()->assertElementOnPage('.logo');
     }
 
     /**
@@ -26,7 +21,7 @@ class HomepageContext extends MagentoProjectContext
      */
     public function iShouldSeeASearchBox()
     {
-        $this->assertSession()->elementExists('css', '#search_mini_form');
+        $this->getMainContext()->assertElementOnPage('#search_mini_form');
     }
 
     /**
@@ -34,7 +29,7 @@ class HomepageContext extends MagentoProjectContext
      */
     public function iShouldSeeTheNavigation()
     {
-        $this->assertSession()->elementExists('css', '#nav');
+        $this->getMainContext()->assertElementOnPage('#nav');
     }
 
     /**
@@ -42,6 +37,6 @@ class HomepageContext extends MagentoProjectContext
      */
     public function iShouldSeeTheFooter()
     {
-        $this->assertSession()->elementExists('css', '.footer');
+        $this->getMainContext()->assertElementOnPage('.footer');
     }
 }
