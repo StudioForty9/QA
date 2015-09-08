@@ -11,12 +11,13 @@
             "StudioForty9": "src/"
         }
     },
-    "config": {
-        "bin-dir": "bin"
-    },
     "description": "StudioForty9 Quality Assurance module",
     "extra": {
         "map": [
+            [
+                ".idea/",
+                ".idea/"
+            ],
             [
                 "features/",
                 "features/"
@@ -35,11 +36,7 @@
         }
     ],
     "require": {
-        "behat/mink-selenium2-driver": "*",
-        "magento-ecg/coding-standard": "1.2",
-        "magento-hackathon/magento-composer-installer": "*",
-        "magetest/magento-behat-extension": "*",
-        "phpunit/phpunit": "*"
+        "magento-hackathon/magento-composer-installer": "*"
     },
     "type": "magento-module",
     "version": "0.0.1"
