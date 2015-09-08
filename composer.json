@@ -2,12 +2,13 @@
     "autoload": {
         "psr-0": {
             "": [
-                "./app",
-                "./app/code/local",
-                "./app/code/community",
-                "./app/code/core",
-                "./lib"
-            ]
+                "vendor/studioforty/qa/src/app",
+                "vendor/studioforty/qa/src/lib",
+                "vendor/studioforty/qa/src/app/code/local",
+                "vendor/studioforty/qa/src/app/code/community",
+                "vendor/studioforty/qa/src/app/code/core"
+            ],
+            "StudioForty9": "src/"
         }
     },
     "config": {
