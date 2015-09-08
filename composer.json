@@ -37,7 +37,7 @@
         }
     ],
     "require": {
-        "magetest/magento-behat-extension": "dev-develop"
+        "magetest/magento-behat-extension": "*"
     },
     "type": "magento-module",
     "version": "0.0.1"
