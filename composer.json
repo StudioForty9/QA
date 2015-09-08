@@ -36,8 +36,8 @@
             "url": "https://github.com/MageTest/BehatMage"
         }
     ],
-    "require": {
-        "magetest/magento-behat-extension": "*"
+    "require-dev": {
+        "magetest/magento-behat-extension": "0.0.3"
     },
     "minimum-stability" : "dev",
     "type": "magento-module",
