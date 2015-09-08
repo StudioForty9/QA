@@ -29,17 +29,17 @@
     "name": "studioforty9/qa",
     "repositories": [
         {
-            "packagist": false
-        },
-        {
-            "type": "git",
-            "url": "https://github.com/MageTest/BehatMage"
+            "type": "composer",
+            "url": "http://packages.firegento.com"
         }
     ],
     "require-dev": {
-        "magetest/magento-behat-extension": "0.0.3"
+        "behat/mink-selenium2-driver": "*",
+        "magento-ecg/coding-standard": "1.2",
+        "magento-hackathon/magento-composer-installer": "*",
+        "magetest/magento-behat-extension": "*",
+        "phpunit/phpunit": "*"
     },
-    "minimum-stability" : "dev",
     "type": "magento-module",
     "version": "0.0.1"
 }
