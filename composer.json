@@ -2,22 +2,20 @@
     "autoload": {
         "psr-0": {
             "": [
-                "vendor/studioforty/qa/src/app",
-                "vendor/studioforty/qa/src/lib",
-                "vendor/studioforty/qa/src/app/code/local",
-                "vendor/studioforty/qa/src/app/code/community",
-                "vendor/studioforty/qa/src/app/code/core"
-            ],
-            "StudioForty9": "src/"
+                "./app",
+                "./app/code/local",
+                "./app/code/community",
+                "./app/code/core",
+                "./lib"
+            ]
         }
+    },
+    "config": {
+        "bin-dir": "bin"
     },
     "description": "StudioForty9 Quality Assurance module",
     "extra": {
         "map": [
-            [
-                ".idea/",
-                ".idea/"
-            ],
             [
                 "features/",
                 "features/"
@@ -36,7 +34,11 @@
         }
     ],
     "require": {
-        "magento-hackathon/magento-composer-installer": "*"
+        "behat/mink-selenium2-driver": "*",
+        "magento-ecg/coding-standard": "dev-master",
+        "magento-hackathon/magento-composer-installer": "*",
+        "magetest/magento-behat-extension": "dev-develop",
+        "phpunit/phpunit": "*"
     },
     "type": "magento-module",
     "version": "0.0.1"
