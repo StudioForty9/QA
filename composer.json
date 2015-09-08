@@ -37,7 +37,7 @@
         "behat/mink-selenium2-driver": "*",
         "magento-ecg/coding-standard": "1.2",
         "magento-hackathon/magento-composer-installer": "*",
-        "magetest/magento-behat-extension": "dev-master",
+        "magetest/magento-behat-extension": "dev-cleanup@dev",
         "phpunit/phpunit": "*"
     },
     "minimum-stability" : "dev",
