@@ -19,7 +19,7 @@ class ProductContext extends MagentoProjectContext
      */
     public function iAmOnAProductPage()
     {
-        $url = Mage::getBaseUrl() . 'catalog/product/view/id/' . $this->_product->getId();
+        $url = $this->getMinkParameter('base_url') . 'catalog/product/view/id/' . $this->_product->getId();
         $this->getSession()->visit($url);
     }
 
@@ -28,8 +28,7 @@ class ProductContext extends MagentoProjectContext
      */
     public function iShouldSeeTheProductName()
     {
-        //$this->getMainContext()->assertElementContainsText('h1', $this->_product->getName());
-        $this->getMainContext()->assertPageContainsText($this->_product->getName());
+        $this->getMainContext()->assertElementContainsText('h1', $this->_product->getName());
     }
 
     /**
@@ -37,8 +36,10 @@ class ProductContext extends MagentoProjectContext
      */
     public function iShouldSeeAValidProductImage()
     {
-        //@TODO
-        return true;
+        $productParams = $this->getMainContext()->getParameter('product');
+        $selector = $productParams['image']['selector'];
+        $image = $this->getSession()->getPage()->find('css', $selector);
+        assertNotContains('placeholder', $image->getAttribute('src'));
     }
 
     /**

@@ -39,7 +39,7 @@ class CustomerContext extends MagentoProjectContext
      */
     public function iGoToTheCustomerLoginPage()
     {
-        $url = Mage::getBaseUrl() . 'customer/account/login';
+        $url = $this->getMinkParameter('base_url') . 'customer/account/login';
         $this->getSession()->visit($url);
     }
 
@@ -86,5 +86,15 @@ class CustomerContext extends MagentoProjectContext
     {
         $this->getSession()->getPage()->clickLink($arg1);
         assertNotNull($this->find('xpath','//h1[contains(., "' . $arg1 . '")]'));
+    }
+
+    /**
+     * @AfterSuite
+     */
+    public static function cleanup($event)
+    {
+        Mage::getModel('customer/customer')->getCollection()
+            ->addFieldToFilter('email', array('like' => "behat%@sf9.ie"))
+            ->delete();
     }
 }

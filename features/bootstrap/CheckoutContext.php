@@ -16,11 +16,11 @@ class CheckoutContext extends MagentoProjectContext
     {
         Mage::getSingleton('core/translate')->setLocale('en_IE')->init('frontend', true);
         $addToCartText = Mage::helper('core')->__('Add to Cart');
+        assertNotNull($this->find('css', '.add-to-cart-buttons button'));
 
-        
         $context = $this->getMainContext();
         $context->pressButton($addToCartText);
-        assertNotNull($this->find('xpath','//*[@id="shopping-cart-totals-table"]'));
+        assertNotNull($this->find('xpath', '//*[@id="shopping-cart-totals-table"]'));
     }
 
     /**
@@ -30,7 +30,7 @@ class CheckoutContext extends MagentoProjectContext
     {
         $product = $this->getRandomProduct();
         $context = $this->getMainContext();
-        $context->visit('/catalog/product/view/id/' . $product->getId());
+        $context->visit($this->getMinkParameter('base_url') . 'catalog/product/view/id/' . $product->getId());
         $this->iAddTheProductToTheCart();
     }
 
@@ -39,8 +39,8 @@ class CheckoutContext extends MagentoProjectContext
      */
     public function iGoToTheCheckout()
     {
-        assertNotNull($this->find('xpath','//*[@id="shopping-cart-totals-table"]'));
-        $this->getSession()->visit(Mage::getBaseUrl() . 'checkout/onepage/');
+        assertNotNull($this->find('xpath', '//*[@id="shopping-cart-totals-table"]'));
+        $this->getSession()->visit($this->getMinkParameter('base_url') . 'checkout/onepage/');
     }
 
     /**
@@ -48,7 +48,7 @@ class CheckoutContext extends MagentoProjectContext
      */
     public function iShouldBeOnTheCheckout()
     {
-        assertNotNull($this->find('xpath','//*[@id="checkoutSteps"]'));
+        assertNotNull($this->find('xpath', '//*[@id="checkoutSteps"]'));
     }
 
     /**
@@ -75,7 +75,7 @@ class CheckoutContext extends MagentoProjectContext
     public function iLoginToMyAccount()
     {
         $date = date('Ymd');
-        
+
         $context = $this->getMainContext();
         $context->fillField('login[username]', "behat-$date@sf9.ie");
         $context->fillField('login[password]', 'password');
@@ -87,10 +87,10 @@ class CheckoutContext extends MagentoProjectContext
      */
     public function iFillInMyBillingAddress()
     {
-        assertNotNull($this->find('xpath','//button[@onclick="billing.save()"]'));
-        
+        assertNotNull($this->find('xpath', '//button[@onclick="billing.save()"]'));
+
         $context = $this->getMainContext();
-        if($this->getSession()->getPage()->find('xpath', '//*[@id="billing:firstname"]')->isVisible()) {
+        if ($this->getSession()->getPage()->find('xpath', '//*[@id="billing:firstname"]')->isVisible()) {
             $context->fillField('billing[firstname]', 'John');
             $context->fillField('billing[lastname]', 'Smith');
 
@@ -134,7 +134,7 @@ class CheckoutContext extends MagentoProjectContext
         $this->getSession()->getDriver()->click('//*[@id="billing:use_for_shipping_no"]');
         $this->getSession()->getDriver()->click('//button[@onclick="billing.save()"]');
 
-        assertNotNull($this->find('xpath','//button[@onclick="shipping.save()"]'));
+        assertNotNull($this->find('xpath', '//button[@onclick="shipping.save()"]'));
 
         $context = $this->getMainContext();
         $context->fillField('shipping[firstname]', 'Jane');
@@ -150,11 +150,11 @@ class CheckoutContext extends MagentoProjectContext
      */
     public function iChooseAShippingMethod()
     {
-        if($this->_differentShippingAddress){
+        if ($this->_differentShippingAddress) {
             $this->getSession()->getDriver()->click('//button[@onclick="shipping.save()"]');
         }
 
-        assertNotNull($this->find('xpath','//button[@onclick="shippingMethod.save()"]'));
+        assertNotNull($this->find('xpath', '//button[@onclick="shippingMethod.save()"]'));
         $this->getSession()->getDriver()->click('//*[@name="shipping_method"]');
         $this->getSession()->getDriver()->click('//button[@onclick="shippingMethod.save()"]');
     }
@@ -164,17 +164,24 @@ class CheckoutContext extends MagentoProjectContext
      */
     public function iChoosePaymentMethod()
     {
-        assertNotNull($this->find('xpath','//button[@onclick="payment.save()"]'));
-        //$this->getSession()->getDriver()->click('//*[@id="p_method_realex"]');
-        $this->getSession()->getDriver()->click('//*[@id="p_method_checkmo"]');
-
-//        $context = $this->getMainContext();
-//        $context->selectOption('Credit Card Type', 'Visa');
-//        $context->fillField('Name as it appears on Credit Card', 'Alan Morkan');
-//        $context->fillField('Name as it appears on Credit Card', '4263971921001307');
-//        $context->selectOption('payment[cc_exp_month]', '10');
-//        $context->selectOption('payment[cc_exp_year]', '2020');
-//        $context->fillField('CVV', '333');
+        assertNotNull($this->find('xpath', '//button[@onclick="payment.save()"]'));
+        $paymentParams = $this->getMainContext()->getParameter('payment');
+        switch ($paymentParams['method']){
+            case 'realex':
+                $this->getSession()->getDriver()->click('//*[@id="p_method_realex"]');
+                $context = $this->getMainContext();
+                $context->selectOption('Credit Card Type', 'Visa');
+                $context->fillField('Name as it appears on Credit Card', 'Alan Morkan');
+                $context->fillField('Name as it appears on Credit Card', '4263971921001307');
+                $context->selectOption('payment[cc_exp_month]', '10');
+                $context->selectOption('payment[cc_exp_year]', '2020');
+                $context->fillField('CVV', '333');
+                break;
+            case 'checkmo':
+            default:
+                $this->getSession()->getDriver()->click('//*[@id="p_method_checkmo"]');
+                break;
+        }
     }
 
     /**
@@ -183,7 +190,7 @@ class CheckoutContext extends MagentoProjectContext
     public function iSaveThePaymentMethod()
     {
         $this->getSession()->getDriver()->click('//button[@onclick="payment.save()"]');
-        assertNotNull($this->find('xpath','//button[@onclick="review.save();"]'));
+        assertNotNull($this->find('xpath', '//button[@onclick="review.save();"]'));
     }
 
     /**
@@ -191,6 +198,20 @@ class CheckoutContext extends MagentoProjectContext
      */
     public function iShouldBeOnTheSuccessPage()
     {
-        assertNotNull($this->find('xpath','//h1[contains(., "Your order has been received.")]'));
+        assertNotNull($this->find('xpath', '//h1[contains(., "Your order has been received.")]'));
+    }
+
+    /**
+     * @AfterSuite
+     */
+    public static function cleanup($event)
+    {
+        Mage::register('isSecureArea', true);
+        $orders = Mage::getModel('sales/order')->getCollection()
+            ->addFieldToFilter('customer_email', array('like' => "behat%@sf9.ie"));
+        foreach($orders as $order){
+            $order->delete();
+        }
+        Mage::unregister('isSecureArea');
     }
 }

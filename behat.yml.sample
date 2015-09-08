@@ -10,13 +10,32 @@ default:
                 server_parameters:
                     HTTP_HOST: %magento.base_url%
             selenium2:
-                #wd_host: "http://localhost:4445/wd/hub"
-                wd_host: "http://localhost:8643/wd/hub"
+                wd_host: "http://localhost:4444/wd/hub"
+                #wd_host: "http://localhost:8910/wd/hub"
                 browser: chrome
             default_session: goutte
             javascript_session: selenium2
     filters:
-        #tags: @done
+        tags: ~@disabled && ~@prod && ~@fixme
     context:
         parameters:
+            base_url: %magento.base_url%
+            custom_contexts:
+              - customfeature1
+              - customfeature2
             theme: rwd
+            payment:
+              method: checkmo
+            product:
+              image:
+                selector: '#image-main'
+
+prod:
+  extensions:
+    Behat\MinkExtension\Extension:
+      base_url: http://www.example.com/
+  filters:
+    tags: ~@disabled
+  context:
+    parameters:
+      base_url: http://www.example.com/

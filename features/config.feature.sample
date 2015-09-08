@@ -1,0 +1,14 @@
+Feature: System Configuration
+
+  @config @prod
+  Scenario: CSS / JS is merged
+    Then the config value for "dev/css/merge_files" is "1"
+    And the config value for "dev/js/merge_files" is "1"
+
+  @config @prod
+  Scenario: Magento cronjob is running
+    Then the Magento cronjob is running
+
+  @config @prod
+  Scenario: Caching is Enabled
+    Then caching is enabled

@@ -24,9 +24,21 @@ class CategoryContext extends MagentoProjectContext
         $collection = Mage::getModel('catalog/category')->setStoreId($store)
             ->getCollection()
             ->addAttributeToSelect(array('is_active', 'url_key', 'name'))
-            ->addAttributeToFilter('path', array("like"=>$rootpath."/"."%"))
+            ->addAttributeToFilter('path', array("like" => $rootpath . "/" . "%"))
             ->addAttributeToFilter('is_active', 1)
             ->setPageSize(1);
+
+        if (!$collection->getSize()) {
+            $this->_category = $this->generateDummyCategory();
+            $this->generateDummyProduct($this->_category);
+            /* @var $indexCollection Mage_Index_Model_Resource_Process_Collection */
+            $indexCollection = Mage::getModel('index/process')->getCollection();
+            foreach ($indexCollection as $index) {
+                /* @var $index Mage_Index_Model_Process */
+                $index->reindexAll();
+            }
+            return;
+        }
 
         $products->addCountToCategories($collection);
 
@@ -41,7 +53,7 @@ class CategoryContext extends MagentoProjectContext
      */
     public function iAmOnACategoryPage()
     {
-        $url = Mage::getBaseUrl() . 'catalog/category/view/id/' . $this->_category->getId();
+        $url = $this->getMinkParameter('base_url') . 'catalog/category/view/id/' . $this->_category->getId();
         $this->getSession()->visit($url);
     }
 
@@ -101,7 +113,7 @@ class CategoryContext extends MagentoProjectContext
      */
     public function iClickOnTheAddToCartButtonOfAProduct()
     {
-        
+
         $context = $this->getMainContext();
         $context->pressButton('Add to Cart');
     }
@@ -122,7 +134,7 @@ class CategoryContext extends MagentoProjectContext
      */
     public function iCanChangeTheSortDirection()
     {
-        
+
         $context = $this->getMainContext();
         $context->clickLink("Set Descending Direction");
         $this->waitForAjax();
@@ -133,8 +145,9 @@ class CategoryContext extends MagentoProjectContext
      */
     public function iCanPaginateForwardsThroughTheListOfResults()
     {
-        //@TODO
-        return true;
+        $element = $this->getSession()->getPage()->find('css', '.pagination .next');
+        $element->click();
+        assertNotNull($this->find('css', '.pagination .previous'));
     }
 
     /**
@@ -142,8 +155,9 @@ class CategoryContext extends MagentoProjectContext
      */
     public function iCanPaginateBackwardsThroughTheListOfResults()
     {
-        //@TODO
-        return true;
+        $element = $this->getSession()->getPage()->find('css', '.pagination .previous');
+        $element->click();
+        assertNotNull($this->find('css', '.pagination .next'));
     }
 
     /**
@@ -162,7 +176,7 @@ class CategoryContext extends MagentoProjectContext
      */
     public function iCanChangeToAGridView()
     {
-        
+
         $context = $this->getMainContext();
         $context->clickLink("Grid");
         $this->waitForAjax();
@@ -173,14 +187,83 @@ class CategoryContext extends MagentoProjectContext
      */
     public function iCanChangeToAListView()
     {
-        
+
         $context = $this->getMainContext();
         $context->clickLink("List");
         $this->waitForAjax();
     }
 
-    public function waitForAjax(){
+    public function waitForAjax()
+    {
         $this->getSession()->wait(10, '(0 === Ajax.activeRequestCount)');
         sleep(1);
+    }
+
+    public function generateDummyCategory()
+    {
+        $category = Mage::getModel('catalog/category');
+        $category->setData(array(
+            'name' => 'Dummy Category',
+            'url_key' => 'dummy-category',
+            'display_mode' => 'PRODUCTS',
+            'is_active' => 1,
+            'is_anchor' => 1,
+            'store_id' => Mage::app()->getStore()->getId()
+        ));
+
+        $category->setPath('1/2');
+
+        $category->save();
+        return $category;
+    }
+
+    public function generateDummyProduct($category)
+    {
+        Mage::app()->setCurrentStore(Mage_Core_Model_App::ADMIN_STORE_ID);
+        $product = Mage::getModel('catalog/product');
+        try {
+            $product->setWebsiteIds(array(1))
+                ->setAttributeSetId(4)
+                ->setTypeId('simple')
+                ->setCreatedAt(strtotime('now'))
+                ->setSku('dummy-product-' . rand(0, 1000))
+                ->setName('Dummy Product')
+                ->setWeight(4.0000)
+                ->setStatus(1)
+                ->setTaxClassId(0)
+                ->setVisibility(Mage_Catalog_Model_Product_Visibility::VISIBILITY_BOTH)
+                ->setPrice(10.00)
+                ->setDescription('This is a long description')
+                ->setShortDescription('This is a short description')
+                ->setStockData(array(
+                        'use_config_manage_stock' => 0,
+                        'manage_stock' => 1,
+                        'min_sale_qty' => 1,
+                        'max_sale_qty' => 2,
+                        'is_in_stock' => 1,
+                        'qty' => 999
+                    )
+                )
+                ->setCategoryIds(array($category->getId()))
+                ->save();
+        } catch (Exception $e) {
+            Mage::log($e->getMessage());
+        }
+    }
+
+    /**
+     * @AfterSuite
+     */
+    public static function cleanup($event)
+    {
+        $categories = Mage::getModel('catalog/category')->getCollection()
+            ->addAttributeToSelect('name')
+            ->addAttributeToFilter('name', 'Dummy Category')
+            ->delete();
+
+        $products = Mage::getModel('catalog/product')->getCollection()
+            ->addAttributeToSelect('name')
+            ->addAttributeToFilter('name', 'Dummy Product')
+            ->delete();
     }
 }

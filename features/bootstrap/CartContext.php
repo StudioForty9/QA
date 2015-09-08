@@ -67,4 +67,16 @@ class CartContext extends MagentoProjectContext
         $context->fillField('Discount Codes', $arg1);
         $context->pressButton('Apply');
     }
+
+    /**
+     * @AfterSuite
+     */
+    public static function cleanup($event)
+    {
+        $coupons = Mage::getModel('salesrule/coupon')->getCollection()
+            ->addFieldToFilter('code', 'Test Coupon');
+        foreach($coupons as $coupon){
+            $coupon->delete();
+        }
+    }
 }

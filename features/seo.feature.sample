@@ -1,0 +1,50 @@
+Feature: SEO
+
+  @seo
+  Scenario: robots.txt file exists
+    Given I am on "/robots.txt"
+    Then the response status code should be 200
+
+  @seo
+  Scenario: robots.txt doesn't block CSS or JS
+    Then "robots.txt" file should not contain ".css"
+    And "robots.txt" file should not contain ".js"
+
+  @seo @javascript @prod
+  Scenario: Google Analytics tracking script is included on page
+    Given I am on the homepage
+    Then the Google Analytics tracking script should be on the page
+
+  @seo @prod
+  Scenario: XML Sitemap exists
+    Given I am on "/sitemap.xml"
+    Then the response status code should be 200
+
+  @seo
+  Scenario: StudioForty9 SEO tag is in footer
+    Given I am on the homepage
+    Then I should see "Ecommerce website by StudioForty9"
+
+  @seo
+  Scenario: 404 page updated
+    Given I am on "/404"
+    Then the response status code should be 404
+    And I should not see "Whoops"
+
+  @seo
+  Scenario: check meta description and keywords are not default
+    Given I am on the homepage
+    Then the meta "description" should not be "Default Description"
+    And the meta "keywords" should not be "Magento, Varien, E-commerce"
+
+  @seo @javascript
+  Scenario: canonical meta tags
+    Given I am on a category page
+    Then the canonical URL should be set
+    Given I am on a product page
+    Then the canonical URL should be set
+
+  @seo @prod
+  Scenario: Check for canonical domain name issue
+    When I go to the non-www version of the site
+    Then I should be redirected to the www version of the site

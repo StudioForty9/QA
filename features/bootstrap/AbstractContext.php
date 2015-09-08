@@ -115,12 +115,12 @@ class AbstractContext extends RawMinkContext
     {
         if ($event->getResult() === 4) {
             Mage::log($event->getScenario()->getTitle(), null, 'behat.log', true);
-            Mage::log($this->getSession()->getCurrentUrl(), null, 'behat.log', true);
+            //Mage::log($this->getSession()->getCurrentUrl(), null, 'behat.log', true);
 
             $driver = $this->getSession()->getDriver();
             if (get_class($driver) == 'Behat\\Mink\\Driver\\Selenium2Driver') {
                 try{
-                    $path = Mage::getBaseDir() . '/var/screenshots';
+                    $path = Mage::getBaseDir() . '/var/behat/screenshots';
                     $io = new Varien_Io_File();
                     $io->checkAndCreateFolder($path);
                     $date = date('Ymdhis');
