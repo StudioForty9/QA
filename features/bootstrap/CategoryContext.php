@@ -1,6 +1,6 @@
 <?php
 
-use Behat\Behat\Context\Step;
+require_once Mage::getBaseDir() . '/vendor/phpunit/phpunit/src/Framework/Assert/Functions.php';
 
 /**
  * Category context.
@@ -28,7 +28,7 @@ class CategoryContext extends MagentoProjectContext
             ->addAttributeToFilter('is_active', 1)
             ->setPageSize(1);
 
-        if (!$collection->getSize()) {
+        if (!$collection->getSize() || !$products->getSize()) {
             $this->_category = $this->generateDummyCategory();
             $this->generateDummyProduct($this->_category);
             /* @var $indexCollection Mage_Index_Model_Resource_Process_Collection */
@@ -97,6 +97,7 @@ class CategoryContext extends MagentoProjectContext
     {
         $className = $this->getClassNameByTheme('productNameOnCategoryPage');
         $link = $this->getSession()->getPage()->find('css', $className);
+        assertNotNull($link);
         $this->getSession()->visit($link->getAttribute('href'));
     }
 
@@ -124,7 +125,9 @@ class CategoryContext extends MagentoProjectContext
     public function iCanChangeWhatAttribueToSortBy()
     {
         $select = $this->getSession()->getPage()->find("css", ".sort-by select");
+        assertNotNull($select);
         $option = $this->getSession()->getPage()->find("css", ".sort-by option[text=\"Name\"]");
+        assertNotNull($option);
         $select->selectOption($option, false);
         $this->waitForAjax();
     }
@@ -215,40 +218,6 @@ class CategoryContext extends MagentoProjectContext
 
         $category->save();
         return $category;
-    }
-
-    public function generateDummyProduct($category)
-    {
-        Mage::app()->setCurrentStore(Mage_Core_Model_App::ADMIN_STORE_ID);
-        $product = Mage::getModel('catalog/product');
-        try {
-            $product->setWebsiteIds(array(1))
-                ->setAttributeSetId(4)
-                ->setTypeId('simple')
-                ->setCreatedAt(strtotime('now'))
-                ->setSku('dummy-product-' . rand(0, 1000))
-                ->setName('Dummy Product')
-                ->setWeight(4.0000)
-                ->setStatus(1)
-                ->setTaxClassId(0)
-                ->setVisibility(Mage_Catalog_Model_Product_Visibility::VISIBILITY_BOTH)
-                ->setPrice(10.00)
-                ->setDescription('This is a long description')
-                ->setShortDescription('This is a short description')
-                ->setStockData(array(
-                        'use_config_manage_stock' => 0,
-                        'manage_stock' => 1,
-                        'min_sale_qty' => 1,
-                        'max_sale_qty' => 2,
-                        'is_in_stock' => 1,
-                        'qty' => 999
-                    )
-                )
-                ->setCategoryIds(array($category->getId()))
-                ->save();
-        } catch (Exception $e) {
-            Mage::log($e->getMessage());
-        }
     }
 
     /**

@@ -155,7 +155,10 @@ class CheckoutContext extends MagentoProjectContext
         }
 
         assertNotNull($this->find('xpath', '//button[@onclick="shippingMethod.save()"]'));
-        $this->getSession()->getDriver()->click('//*[@name="shipping_method"]');
+        $radio = $this->getSession()->getPage()->find('xpath', '//*[@name="shipping_method"]');
+        if($radio->isVisible()) {
+            $radio->click();
+        }
         $this->getSession()->getDriver()->click('//button[@onclick="shippingMethod.save()"]');
     }
 

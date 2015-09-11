@@ -83,6 +83,7 @@ class SeoContext extends MagentoProjectContext
 
         $page = $this->getSession()->getPage();
         $element = $page->find("xpath", $xpath);
+        assertNotNull($element);
         assertNotNull($element->getAttribute('href'));
     }
 }

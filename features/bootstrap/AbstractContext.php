@@ -40,7 +40,48 @@ class AbstractContext extends RawMinkContext
         $collection = $this->getBasicProductCollection();
         $collection->getSelect()->order(new Zend_Db_Expr('RAND()'));
 
+        if(!$collection->getSize()){
+            return $this->generateDummyProduct();
+        }
+
         return $collection->getFirstItem();
+    }
+
+    public function generateDummyProduct($category = null)
+    {
+        Mage::app()->setCurrentStore(Mage_Core_Model_App::ADMIN_STORE_ID);
+        $product = Mage::getModel('catalog/product');
+        try {
+            $product->setWebsiteIds(array(1))
+                ->setAttributeSetId(4)
+                ->setTypeId('simple')
+                ->setCreatedAt(strtotime('now'))
+                ->setSku('dummy-product-' . rand(0, 1000))
+                ->setName('Dummy Product')
+                ->setWeight(4.0000)
+                ->setStatus(1)
+                ->setTaxClassId(0)
+                ->setVisibility(Mage_Catalog_Model_Product_Visibility::VISIBILITY_BOTH)
+                ->setPrice(10.00)
+                ->setDescription('This is a long description')
+                ->setShortDescription('This is a short description')
+                ->setStockData(array(
+                        'use_config_manage_stock' => 0,
+                        'manage_stock' => 1,
+                        'min_sale_qty' => 1,
+                        'max_sale_qty' => 2,
+                        'is_in_stock' => 1,
+                        'qty' => 999
+                    )
+                );
+
+                if($category) {
+                    $product->setCategoryIds(array($category->getId()));
+                }
+                $product->save();
+        } catch (Exception $e) {
+            Mage::log($e->getMessage());
+        }
     }
 
     public function getClassNameByTheme($key){
