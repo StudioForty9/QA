@@ -20,9 +20,9 @@ default:
     context:
         parameters:
             base_url: %magento.base_url%
-            custom_contexts:
-              - customfeature1
-              - customfeature2
+            # custom_contexts:
+            #   - customfeature1
+            #   - customfeature2
             theme: rwd
             payment:
               method: checkmo

@@ -25,6 +25,9 @@
             [
                 "behat.yml.sample",
                 "behat.yml.sample"
+            ],
+            [   "bin/",
+                "bin/"
             ]
         ]
     },

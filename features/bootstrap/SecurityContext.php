@@ -53,6 +53,7 @@ class SecurityContext extends MagentoProjectContext
     {
         $this->getMainContext()->visit($this->getMinkParameter('base_url') . 'wordpress/readme.html');
         $element = $this->find('xpath', '//*[@id="logo"]');
+        assertNotNull($element);
 
         $versionString = $element->getText();
         $version = str_replace('Version ', '', $versionString);
