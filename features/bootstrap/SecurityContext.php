@@ -45,6 +45,7 @@ class SecurityContext extends MinkContext
     {
         $this->visit($this->getMinkParameter('base_url') . 'wordpress/readme.html');
         $element = $this->find('xpath', '//*[@id="logo"]');
+        PHPUnit_Framework_Assert::assertNotNull($element, 'Wordpress is not installed. Disable this scenario');
 
         $versionString = $element->getText();
         $version = str_replace('Version ', '', $versionString);
