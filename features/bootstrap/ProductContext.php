@@ -1,17 +1,23 @@
 <?php
 
-use Behat\Behat\Context\Step;
+use Behat\MinkExtension\Context\MinkContext;
 
 /**
  * Category context.
  */
-class ProductContext extends MagentoProjectContext
+class ProductContext extends MinkContext
 {
-    protected $_product = null;
+    use AbstractContext, MagentoProjectContext;
 
-    public function __construct()
+    protected $_product = null;
+    protected $_image = null;
+    protected $_theme = null;
+
+    public function __construct($theme, $image)
     {
         $this->_product = $this->getRandomProduct();
+        $this->_image = $image;
+        $this->_theme = $theme;
     }
 
     /**
@@ -28,7 +34,7 @@ class ProductContext extends MagentoProjectContext
      */
     public function iShouldSeeTheProductName()
     {
-        $this->getMainContext()->assertElementContainsText('h1', $this->_product->getName());
+        $this->assertElementContainsText('h1', trim($this->_product->getName()));
     }
 
     /**
@@ -36,10 +42,9 @@ class ProductContext extends MagentoProjectContext
      */
     public function iShouldSeeAValidProductImage()
     {
-        $productParams = $this->getMainContext()->getParameter('product');
-        $selector = $productParams['image']['selector'];
+        $selector = $this->_image['selector'];
         $image = $this->getSession()->getPage()->find('css', $selector);
-        assertNotContains('placeholder', $image->getAttribute('src'));
+        PHPUnit_Framework_Assert::assertNotContains('placeholder', $image->getAttribute('src'));
     }
 
     /**
@@ -55,7 +60,7 @@ class ProductContext extends MagentoProjectContext
      */
     public function iShouldBeOnTheCartPage()
     {
-        assertNotNull($this->find('xpath','//h1[contains(., "Shopping Cart")]'));
-        $this->getMainContext()->assertPageAddress('/checkout/cart/');
+        PHPUnit_Framework_Assert::assertNotNull($this->find('xpath','//h1[contains(., "Shopping Cart")]'));
+        $this->assertPageAddress('/checkout/cart/');
     }
 }

@@ -1,6 +1,16 @@
+@email
 Feature: Emails
 
-#emails - check not mention magento, magenta logo,
-#contact form, mail catcher for emails?,
-
-#contact form - check phone exists, and check email is not example.com
+  Scenario: Test
+    Given I purge mails
+    And I am on "/contacts"
+    Then I should not see "@example.com"
+    When I fill in "name" with "John Smith"
+    And I fill in "email" with "alan@sf9.ie"
+    And I fill in "telephone" with "0863016163"
+    And I fill in "comment" with "Behat Message"
+    And I press "Send"
+    Then 1 mail should be sent
+    When I open mail with subject "Contact Form"
+    Then I should see "Behat Message" in mail
+    And I should not see "Magento" in mail

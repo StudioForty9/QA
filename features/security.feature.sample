@@ -1,33 +1,30 @@
+@security
 Feature: Security
 
-  @security
   Scenario: .htaccess
     When I am on "/app/etc/local.xml"
     Then the response status code should be 403
 
-  @security
   Scenario: non-standard admin path
     When I am on "/admin"
     Then the response status code should be 404
 
-  @security
   Scenario: non-standard admin username
     Then an admin user with username "admin" should not exist
 
-  @security @prod
+  @prod
   Scenario: check logging is disabled
     Then the config value for "dev/log/active" is "0"
 
-  @security @prod
+  @prod
   Scenario: disable access to Magento Connect
     When I am on "/downloader/"
     Then the response status code should be 404
 
-  @security @prod
+  @prod
   Scenario: SSL
     Then the site has a valid SSL certificate
 
-  @security
   Scenario: Wordpress is up to date
     Given Wordpress is installed
     Then Wordpress is using the latest version

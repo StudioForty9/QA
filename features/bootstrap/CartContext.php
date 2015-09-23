@@ -1,12 +1,14 @@
 <?php
 
-use Behat\Behat\Context\Step;
+use Behat\MinkExtension\Context\MinkContext;
 
 /**
  * Cart context.
  */
-class CartContext extends MagentoProjectContext
+class CartContext extends MinkContext
 {
+    use AbstractContext, MagentoProjectContext;
+
     /**
      * @When /^I change the Qty to (\d+)$/
      */
@@ -14,7 +16,7 @@ class CartContext extends MagentoProjectContext
     {
         $element = $this->getSession()->getPage()->find('css', '.qty');
 
-        $context = $this->getMainContext();
+        $context = $this;
         $context->fillField($element->getAttribute('name'), $arg1);
         $context->pressButton('Update');
     }
@@ -63,7 +65,7 @@ class CartContext extends MagentoProjectContext
      */
     public function iApplyTheCouponCode($arg1)
     {
-        $context = $this->getMainContext();
+        $context = $this;
         $context->fillField('Discount Codes', $arg1);
         $context->pressButton('Apply');
     }

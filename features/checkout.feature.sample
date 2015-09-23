@@ -1,10 +1,12 @@
+@checkout @javascript
 Feature: Checkout
 
-  @checkout @javascript
-  Scenario: Checkout as Guest
+  Background:
     When I add a product to the cart
     And I go to the checkout
-    And I choose Guest Checkout
+
+  Scenario: Checkout as Guest
+    When I choose Guest Checkout
     And I fill in my Billing Address
     And I use my Billing Address as my Shipping Address
     And I choose a Shipping Method
@@ -13,11 +15,8 @@ Feature: Checkout
     And I press "Place Order"
     Then I should be on the Success Page
 
-  @checkout @javascript
   Scenario: Register as Customer
-    When I add a product to the cart
-    And I go to the checkout
-    And I choose Register
+    When I choose Register
     And I fill in my Billing Address
     And I fill in a Password
     And I use my Billing Address as my Shipping Address
@@ -27,12 +26,9 @@ Feature: Checkout
     And I press "Place Order"
     Then I should be on the Success Page
 
-  @checkout @javascript
   Scenario: Login to Checkout
     Given I am a registered customer
-    When I add a product to the cart
-    And I go to the checkout
-    And I login to my account
+    When I login to my account
     And I fill in my Billing Address
     And I use my Billing Address as my Shipping Address
     And I choose a Shipping Method
@@ -41,11 +37,8 @@ Feature: Checkout
     And I press "Place Order"
     Then I should be on the Success Page
 
-  @checkout @javascript
   Scenario: Checkout with Different Shipping Address
-    When I add a product to the cart
-    And I go to the checkout
-    And I choose Guest Checkout
+    When I choose Guest Checkout
     And I fill in my Billing Address
     And I enter a different Shipping Address
     And I choose a Shipping Method
@@ -54,5 +47,5 @@ Feature: Checkout
     And I press "Place Order"
     Then I should be on the Success Page
 
-  @checkout @javascript @todo
+  @todo
   Scenario: Checkout with Paypal

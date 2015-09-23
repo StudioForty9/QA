@@ -1,38 +1,13 @@
 <?php
 
-use Behat\Behat\Exception\PendingException;
-use Behat\Behat\Context\Step;
+use Behat\MinkExtension\Context\MinkContext;
+
 /**
  * Customer context.
  */
-class CustomerContext extends MagentoProjectContext
+class CustomerContext extends MinkContext
 {
-    /**
-     * @Given /^I am a registered customer$/
-     */
-    public function iAmARegisteredCustomer()
-    {
-        $websiteId = Mage::app()->getWebsite()->getId();
-        $store = Mage::app()->getStore();
-        $date = date('Ymd');
-
-        $customer = Mage::getModel('customer/customer')->setWebsiteId($websiteId)->loadByEmail("behat-$date@sf9.ie");
-        if(!$customer->getId()) {
-            $customer->setStore($store)
-                ->setFirstname('Behat')
-                ->setLastname($date)
-                ->setEmail("behat-$date@sf9.ie")
-                ->setPassword('password');
-
-            try {
-                $customer->save();
-            } catch (Exception $e) {
-                Zend_Debug::dump($e->getMessage());
-            }
-        }
-
-        return $customer;
-    }
+    use AbstractContext, MagentoProjectContext;
 
     /**
      * @When /^I go to the customer login page$/
@@ -49,9 +24,8 @@ class CustomerContext extends MagentoProjectContext
     public function iEnterMyUsernameAndPassword()
     {
         $date = date('Ymd');
-        $context = $this->getMainContext();
-        $context->fillField('Email Address', "behat-$date@sf9.ie");
-        $context->fillField('Password', 'password');
+        $this->fillField('Email Address', "behat-$date@sf9.ie");
+        $this->fillField('Password', 'password');
     }
 
     /**
@@ -59,8 +33,8 @@ class CustomerContext extends MagentoProjectContext
      */
     public function iShouldByOnTheMyAccountPage()
     {
-        assertNotNull($this->find('xpath','//h1[contains(., "My Dashboard")]'));
-        $this->getMainContext()->assertPageAddress('/customer/account/');
+        PHPUnit_Framework_Assert::assertNotNull($this->find('xpath','//h1[contains(., "My Dashboard")]'));
+        $this->assertPageAddress('/customer/account/');
     }
 
     /**
@@ -71,12 +45,10 @@ class CustomerContext extends MagentoProjectContext
         $this->iGoToTheCustomerLoginPage();
         $date = date('Ymd');
 
-        /* @var $context Behat\MinkExtension\Context\MinkContext */
-        $context = $this->getMainContext();
-        $context->fillField('Email Address', "behat-$date@sf9.ie");
-        $context->fillField('Password', 'password');
-        $context->pressButton('Login');
-        assertNotNull($this->find('xpath','//h1[contains(., "My Dashboard")]'));
+        $this->fillField('Email Address', "behat-$date@sf9.ie");
+        $this->fillField('Password', 'password');
+        $this->pressButton('Login');
+        PHPUnit_Framework_Assert::assertNotNull($this->find('xpath','//h1[contains(., "My Dashboard")]'));
     }
 
     /**
@@ -85,7 +57,7 @@ class CustomerContext extends MagentoProjectContext
     public function iClickOn($arg1)
     {
         $this->getSession()->getPage()->clickLink($arg1);
-        assertNotNull($this->find('xpath','//h1[contains(., "' . $arg1 . '")]'));
+        PHPUnit_Framework_Assert::assertNotNull($this->find('xpath','//h1[contains(., "' . $arg1 . '")]'));
     }
 
     /**

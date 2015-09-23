@@ -1,14 +1,15 @@
 <?php
 
-use Behat\Behat\Exception\PendingException;
-
-require_once Mage::getBaseDir() . '/vendor/phpunit/phpunit/src/Framework/Assert/Functions.php';
+use Behat\MinkExtension\Context\MinkContext;
 
 /**
- * Category context.
+ * SEO context.
  */
-class SeoContext extends MagentoProjectContext
+class SeoContext extends MinkContext
 {
+
+    use AbstractContext, MagentoProjectContext;
+
     /**
      * @Then /^the Google Analytics tracking script should be on the page$/
      */
@@ -28,10 +29,9 @@ class SeoContext extends MagentoProjectContext
      */
     public function iGoToTheNonWwwVersionOfTheSite()
     {
-        $context = $this->getMainContext();
         $baseUrl = $this->getMinkParameter('base_url');
         $page = str_replace('www.', '', $baseUrl);
-        $context->visit($page);
+        $this->visit($page);
     }
 
     /**
@@ -39,19 +39,7 @@ class SeoContext extends MagentoProjectContext
      */
     public function iShouldBeRedirectedToTheWwwVersionOfTheSite()
     {
-        $this->getMainContext()->assertPageAddress($this->getMinkParameter('base_url'));
-    }
-
-    /**
-     * @Then /^"([^"]*)" file should not contain "([^"]*)"$/
-     */
-    public function fileShouldNotContain($arg1, $arg2)
-    {
-        $url = $this->getMinkParameter('base_url') . $arg1;
-        $file = new Varien_Io_File();
-        $contents = @$file->read($url);
-        $result = strstr($contents, $arg2);
-        assertFalse($result);
+        $this->assertPageAddress($this->getMinkParameter('base_url'));
     }
 
     /**
@@ -68,9 +56,9 @@ class SeoContext extends MagentoProjectContext
         $element = $page->find("xpath", $xpath);
 
         if ($type == 'title') {
-            assertNotEquals($element->getHtml(), $value);
+            PHPUnit_Framework_Assert::assertNotEquals($element->getHtml(), $value);
         } else {
-            assertNotEquals($element->getAttribute('content'), $value);
+            PHPUnit_Framework_Assert::assertNotEquals($element->getAttribute('content'), $value);
         }
     }
 
@@ -83,7 +71,6 @@ class SeoContext extends MagentoProjectContext
 
         $page = $this->getSession()->getPage();
         $element = $page->find("xpath", $xpath);
-        assertNotNull($element);
-        assertNotNull($element->getAttribute('href'));
+        PHPUnit_Framework_Assert::assertNotNull($element->getAttribute('href'));
     }
 }

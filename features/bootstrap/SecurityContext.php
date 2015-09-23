@@ -1,14 +1,14 @@
 <?php
 
-use Behat\Behat\Context\Step;
-
-require_once Mage::getBaseDir() . '/vendor/phpunit/phpunit/src/Framework/Assert/Functions.php';
+use Behat\MinkExtension\Context\MinkContext;
 
 /**
  * Category context.
  */
-class SecurityContext extends MagentoProjectContext
+class SecurityContext extends MinkContext
 {
+    use AbstractContext, MagentoProjectContext;
+
     /**
      * @Then /^an admin user with username "([^"]*)" should not exist$/
      */
@@ -17,15 +17,7 @@ class SecurityContext extends MagentoProjectContext
         $admins = Mage::getModel('admin/user')->getCollection()
             ->addFieldToFilter('username', $arg1);
 
-        assertEquals(0, $admins->count());
-    }
-
-    /**
-     * @Then /^the config value for "([^"]*)" is "([^"]*)"$/
-     */
-    public function theConfigValueForIs($arg1, $arg2)
-    {
-        assertEquals(Mage::getStoreConfig($arg1), $arg2);
+        PHPUnit_Framework_Assert::assertEquals(0, $admins->count());
     }
 
     /**
@@ -34,7 +26,7 @@ class SecurityContext extends MagentoProjectContext
     public function theSiteHasAValidSslCertificate()
     {
         $url = str_replace('http://', 'https://', $this->getMinkParameter('base_url'));
-        $this->getMainContext()->visit($url);
+        $this->visit($url);
     }
 
     /**
@@ -42,8 +34,8 @@ class SecurityContext extends MagentoProjectContext
      */
     public function wordpressIsInstalled()
     {
-        $this->getMainContext()->visit($this->getMinkParameter('base_url') . 'wordpress');
-        $this->getMainContext()->assertResponseStatus(200);
+        $this->visit($this->getMinkParameter('base_url') . 'wordpress');
+        $this->assertResponseStatus(200);
     }
 
     /**
@@ -51,17 +43,16 @@ class SecurityContext extends MagentoProjectContext
      */
     public function wordpressIsUsingTheLatestVersion()
     {
-        $this->getMainContext()->visit($this->getMinkParameter('base_url') . 'wordpress/readme.html');
+        $this->visit($this->getMinkParameter('base_url') . 'wordpress/readme.html');
         $element = $this->find('xpath', '//*[@id="logo"]');
-        assertNotNull($element);
 
         $versionString = $element->getText();
         $version = str_replace('Version ', '', $versionString);
 
-        $this->getMainContext()->visit('https://wordpress.org/download/release-archive/');
+        $this->visit('https://wordpress.org/download/release-archive/');
         $element = $this->find('xpath', '//*[@id="pagebody"]/div/div[1]/table[1]/tbody/tr[1]/td[1]');
         $latestVersion = $element->getText();
 
-        assertEquals($version, $latestVersion, 'Latest Version of Wordpress (' . $latestVersion . ') is not installed');
+        PHPUnit_Framework_Assert::assertEquals($version, $latestVersion, 'Latest Version of Wordpress (' . $latestVersion . ') is not installed');
     }
 }

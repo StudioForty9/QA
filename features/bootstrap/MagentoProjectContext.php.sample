@@ -1,5 +1,160 @@
 <?php
 
-class MagentoProjectContext extends AbstractContext
+trait MagentoProjectContext
 {
+    /**
+     * @Then /^I should see a success message$/
+     */
+    public function iShouldSeeASuccessMessage()
+    {
+        $this->assertElementOnPage('.success-msg');
+    }
+
+    /**
+     * @Then /^I should see an error message$/
+     */
+    public function iShouldSeeAnErrorMessage()
+    {
+        $this->assertElementOnPage('.error-msg');
+    }
+
+    /**
+     * @Given /^I add the Product to the Cart$/
+     */
+    public function iAddTheProductToTheCart()
+    {
+        Mage::getSingleton('core/translate')->setLocale('en_IE')->init('frontend', true);
+        $addToCartText = Mage::helper('core')->__('Add to Cart');
+        //($this->find('css', '.add-to-cart-buttons button'));
+
+        $this->pressButton($addToCartText);
+        PHPUnit_Framework_Assert::assertNotNull($this->getSession()->getPage()->find('xpath',
+            '//*[@id="shopping-cart-totals-table"]'));
+    }
+
+    /**
+     * @When /^I add a product to the cart$/
+     */
+    public function iAddAProductToTheCart()
+    {
+        $product = $this->getRandomProduct();
+        $this->visit($this->getMinkParameter('base_url') . 'catalog/product/view/id/' . $product->getId());
+        $this->iAddTheProductToTheCart();
+    }
+
+    /**
+     * @Given /^I should be on the Checkout$/
+     */
+    public function iShouldBeOnTheCheckout()
+    {
+        PHPUnit_Framework_Assert::assertNotNull($this->find('xpath', '//*[@id="checkoutSteps"]'));
+    }
+
+    /**
+     * @Given /^I am a registered customer$/
+     */
+    public function iAmARegisteredCustomer()
+    {
+        $websiteId = Mage::app()->getWebsite()->getId();
+        $store = Mage::app()->getStore();
+        $date = date('Ymd');
+
+        $customer = Mage::getModel('customer/customer')->setWebsiteId($websiteId)->loadByEmail("behat-$date@sf9.ie");
+        if(!$customer->getId()) {
+            $customer->setStore($store)
+                ->setFirstname('Behat')
+                ->setLastname($date)
+                ->setEmail("behat-$date@sf9.ie")
+                ->setPassword('password');
+
+            $addressData = array(
+                'firstname' => 'Behat',
+                'lastname' => $date,
+                'company' => 'StudioForty9',
+                'street' => '20a Lower John Street',
+                'city' => 'Cork',
+                'country_id' => 'IE',
+                'telephone' => '0872251250',
+                'is_default_billing' => 1,
+                'is_default_shipping' => 1
+            );
+            $address   = Mage::getModel('customer/address');
+            $address->addData($addressData);
+            $customer->addAddress($address);
+
+            try {
+                $customer->save();
+            } catch (Exception $e) {
+                die(var_dump($e->getMessage()));
+                Zend_Debug::dump($e->getMessage());
+            }
+        }
+
+        return $customer;
+    }
+
+    /**
+     * @Then /^the config value for "([^"]*)" is "([^"]*)"$/
+     */
+    public function theConfigValueForIs($arg1, $arg2)
+    {
+        PHPUnit_Framework_Assert::assertEquals(Mage::getStoreConfig($arg1), $arg2);
+    }
+
+    /**
+     * @Given /^I should see the breadcrumbs$/
+     */
+    public function iShouldSeeTheBreadcrumbs()
+    {
+        $className = $this->getClassNameByTheme($this->_theme, 'breadcrumbs');
+        $this->assertElementOnPage($className);
+    }
+
+    /**
+     * @Then /^"([^"]*)" file should not contain "([^"]*)"$/
+     */
+    public function fileShouldNotContain($arg1, $arg2)
+    {
+        $url = $this->getMinkParameter('base_url') . $arg1;
+        $file = new Varien_Io_File();
+        $contents = @$file->read($url);
+        $result = strstr($contents, $arg2);
+        PHPUnit_Framework_Assert::assertFalse($result);
+    }
+
+
+    /**
+     * @Then /^I should have (\d+) products in the Cart$/
+     */
+    public function iShouldHaveProductsInTheCart($arg1)
+    {
+        /* @var $quote Mage_Sales_Model_Quote */
+        $quote = Mage::getModel('sales/quote')->getCollection()->getLastItem();
+        PHPUnit_Framework_Assert::assertEquals($quote->getItemsCount(), $arg1);
+    }
+
+    /**
+     * @Given /^I am not on a Decimal Qty Product page$/
+     */
+    public function iAmNotOnADecimalQtyProductPage()
+    {
+        $this->onADecimalQtyProductPageToggle('nin');
+    }
+
+    /**
+     * @Given /^I am on a Decimal Qty Product page$/
+     */
+    public function iAmOnADecimalQtyProductPage()
+    {
+        $this->onADecimalQtyProductPageToggle('in');
+    }
+
+    /**
+     * @Given /^the Qty should be "([^"]*)"$/
+     */
+    public function theQtyShouldBe($arg1)
+    {
+        $element = $this->getSession()->getPage()->find('css', '.qty');
+        $this->assertFieldContains($element->getAttribute('name'), $arg1);
+    }
 }

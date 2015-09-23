@@ -1,10 +1,11 @@
 <?php
 
-require_once dirname(__FILE__) . '/MagentoProjectContext.php';
+use Behat\MinkExtension\Context\MinkContext;
 
 /**
- * Admin context.
+ * Cart context.
  */
-class AdminContext extends MagentoProjectContext
+class AdminContext extends MinkContext
 {
+    use AbstractContext, MagentoProjectContext;
 }

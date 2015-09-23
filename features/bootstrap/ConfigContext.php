@@ -1,14 +1,14 @@
 <?php
 
-use Behat\Behat\Exception\PendingException;
-
-require_once Mage::getBaseDir() . '/vendor/phpunit/phpunit/src/Framework/Assert/Functions.php';
+use Behat\MinkExtension\Context\MinkContext;
 
 /**
- * Category context.
+ * Config context.
  */
-class ConfigContext extends MagentoProjectContext
+class ConfigContext extends MinkContext
 {
+    use AbstractContext, MagentoProjectContext;
+
     /**
      * @Then /^the Magento cronjob is running$/
      */
@@ -16,7 +16,7 @@ class ConfigContext extends MagentoProjectContext
     {
         $crons = Mage::getModel('cron/schedule')->getCollection()
             ->addFieldToFilter('created_at', array('date' => true, 'gt' => date('Y-m-d 00:00:00')));
-        assertGreaterThan(0, $crons->count());
+        PHPUnit_Framework_Assert::assertGreaterThan(0, $crons->count());
     }
 
     /**
@@ -26,6 +26,6 @@ class ConfigContext extends MagentoProjectContext
     {
         $caches = Mage::getResourceModel('core/cache')->getAllOptions();
         $disabledCaches = array_search(0, $caches);
-        assertFalse($disabledCaches);
+        PHPUnit_Framework_Assert::assertFalse($disabledCaches);
     }
 }

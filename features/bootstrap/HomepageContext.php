@@ -1,19 +1,20 @@
 <?php
 
-use Behat\Behat\Exception\PendingException;
-use Behat\Behat\Context\BehatContext;
+use Behat\MinkExtension\Context\MinkContext;
 
 /**
  * Homepage context.
  */
-class HomepageContext extends MagentoProjectContext
+class HomepageContext extends MinkContext
 {
+    use AbstractContext, MagentoProjectContext;
+
     /**
      * @Then /^I should see the logo$/
      */
     public function iShouldSeeTheLogo()
     {
-        $this->getMainContext()->assertElementOnPage('.logo');
+        $this->assertElementOnPage('.logo');
     }
 
     /**
@@ -21,7 +22,7 @@ class HomepageContext extends MagentoProjectContext
      */
     public function iShouldSeeASearchBox()
     {
-        $this->getMainContext()->assertElementOnPage('#search_mini_form');
+        $this->assertElementOnPage('#search_mini_form');
     }
 
     /**
@@ -29,7 +30,7 @@ class HomepageContext extends MagentoProjectContext
      */
     public function iShouldSeeTheNavigation()
     {
-        $this->getMainContext()->assertElementOnPage('#nav');
+        $this->assertElementOnPage('#nav');
     }
 
     /**
@@ -37,6 +38,6 @@ class HomepageContext extends MagentoProjectContext
      */
     public function iShouldSeeTheFooter()
     {
-        $this->getMainContext()->assertElementOnPage('.footer');
+        $this->assertElementOnPage('.footer');
     }
 }

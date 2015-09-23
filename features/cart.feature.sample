@@ -1,10 +1,10 @@
+@cart @javascript
 Feature: Cart
-  @cart
+
   Scenario: Empty Cart
     Given I am on "/checkout/cart"
     Then I should see "Shopping Cart is Empty"
-  
-  @cart @javascript
+
   Scenario: Cart
     When I add a product to the cart
     Then I should see "Product"
@@ -13,19 +13,17 @@ Feature: Cart
     When I press "Proceed to Checkout"
     And I should be on the Checkout
 
-  @cart @javascript
   Scenario: Update Qty
     When I add a product to the cart
     When I change the Qty to 10
     And I press "Update Cart"
 
-  @cart @javascript @disabled
+  @disabled
   Scenario: Clear Shopping Cart
     When I add a product to the cart
     And I press "Clear Shopping Cart"
     Then I should see "Shopping Cart is Empty"
 
-  @cart @javascript
   Scenario: Apply a Discount
     Given a discount exists with code "Test Discount"
     When I add a product to the cart

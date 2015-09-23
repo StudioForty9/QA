@@ -1,15 +1,18 @@
 <?php
 
-require_once Mage::getBaseDir() . '/vendor/phpunit/phpunit/src/Framework/Assert/Functions.php';
+use Behat\MinkExtension\Context\MinkContext;
 
 /**
  * Category context.
  */
-class CategoryContext extends MagentoProjectContext
+class CategoryContext extends MinkContext
 {
-    protected $_category = null;
+    use AbstractContext, MagentoProjectContext;
 
-    public function __construct()
+    protected $_category = null;
+    protected $_theme = null;
+
+    public function __construct($theme)
     {
         $store = Mage::app()->getStore()->getId();
         $rootCategoryId = Mage::app()->getStore()->getRootCategoryId();
@@ -28,7 +31,7 @@ class CategoryContext extends MagentoProjectContext
             ->addAttributeToFilter('is_active', 1)
             ->setPageSize(1);
 
-        if (!$collection->getSize() || !$products->getSize()) {
+        if (!$collection->getSize()) {
             $this->_category = $this->generateDummyCategory();
             $this->generateDummyProduct($this->_category);
             /* @var $indexCollection Mage_Index_Model_Resource_Process_Collection */
@@ -45,6 +48,7 @@ class CategoryContext extends MagentoProjectContext
         $collection->getSelect()->order(new Zend_Db_Expr('RAND()'));
 
         $this->_category = $collection->getFirstItem();
+        $this->_theme = $theme;
     }
 
 
@@ -62,16 +66,7 @@ class CategoryContext extends MagentoProjectContext
      */
     public function iShouldSeeTheCategoryName()
     {
-        $this->getMainContext()->assertElementContainsText('h1', $this->_category->getName());
-    }
-
-    /**
-     * @Given /^I should see the breadcrumbs$/
-     */
-    public function iShouldSeeTheBreadcrumbs()
-    {
-        $className = $this->getClassNameByTheme('breadcrumbs');
-        $this->getMainContext()->assertElementOnPage($className);
+        $this->assertElementContainsText('h1', $this->_category->getName());
     }
 
     /**
@@ -79,7 +74,7 @@ class CategoryContext extends MagentoProjectContext
      */
     public function iShouldSeeAListOfProducts()
     {
-        $this->getMainContext()->assertElementOnPage('.category-products');
+        $this->assertElementOnPage('.category-products');
     }
 
     /**
@@ -87,7 +82,7 @@ class CategoryContext extends MagentoProjectContext
      */
     public function eachProductShouldHaveAPrice()
     {
-        $this->getMainContext()->assertElementOnPage('.price-box');
+        $this->assertElementOnPage('.price-box');
     }
 
     /**
@@ -95,9 +90,9 @@ class CategoryContext extends MagentoProjectContext
      */
     public function iClickOnAProduct()
     {
-        $className = $this->getClassNameByTheme('productNameOnCategoryPage');
+        $className = $this->getClassNameByTheme($this->_theme, 'productNameOnCategoryPage');
         $link = $this->getSession()->getPage()->find('css', $className);
-        assertNotNull($link);
+        PHPUnit_Framework_Assert::assertNotNull($link);
         $this->getSession()->visit($link->getAttribute('href'));
     }
 
@@ -106,7 +101,7 @@ class CategoryContext extends MagentoProjectContext
      */
     public function iShouldBeOnAProductPage()
     {
-        $this->getMainContext()->assertElementOnPage('body.catalog-product-view');
+        $this->assertElementOnPage('body.catalog-product-view');
     }
 
     /**
@@ -115,19 +110,17 @@ class CategoryContext extends MagentoProjectContext
     public function iClickOnTheAddToCartButtonOfAProduct()
     {
 
-        $context = $this->getMainContext();
+        $context = $this;
         $context->pressButton('Add to Cart');
     }
 
     /**
-     * @Then /^I can change what attribue to sort by$/
+     * @Then /^I can change what attribute to sort by$/
      */
-    public function iCanChangeWhatAttribueToSortBy()
+    public function iCanChangeWhatAttributeToSortBy()
     {
         $select = $this->getSession()->getPage()->find("css", ".sort-by select");
-        assertNotNull($select);
         $option = $this->getSession()->getPage()->find("css", ".sort-by option[text=\"Name\"]");
-        assertNotNull($option);
         $select->selectOption($option, false);
         $this->waitForAjax();
     }
@@ -138,7 +131,7 @@ class CategoryContext extends MagentoProjectContext
     public function iCanChangeTheSortDirection()
     {
 
-        $context = $this->getMainContext();
+        $context = $this;
         $context->clickLink("Set Descending Direction");
         $this->waitForAjax();
     }
@@ -180,7 +173,7 @@ class CategoryContext extends MagentoProjectContext
     public function iCanChangeToAGridView()
     {
 
-        $context = $this->getMainContext();
+        $context = $this;
         $context->clickLink("Grid");
         $this->waitForAjax();
     }
@@ -191,7 +184,7 @@ class CategoryContext extends MagentoProjectContext
     public function iCanChangeToAListView()
     {
 
-        $context = $this->getMainContext();
+        $context = $this;
         $context->clickLink("List");
         $this->waitForAjax();
     }
@@ -218,6 +211,40 @@ class CategoryContext extends MagentoProjectContext
 
         $category->save();
         return $category;
+    }
+
+    public function generateDummyProduct($category)
+    {
+        Mage::app()->setCurrentStore(Mage_Core_Model_App::ADMIN_STORE_ID);
+        $product = Mage::getModel('catalog/product');
+        try {
+            $product->setWebsiteIds(array(1))
+                ->setAttributeSetId(4)
+                ->setTypeId('simple')
+                ->setCreatedAt(strtotime('now'))
+                ->setSku('dummy-product-' . rand(0, 1000))
+                ->setName('Dummy Product')
+                ->setWeight(4.0000)
+                ->setStatus(1)
+                ->setTaxClassId(0)
+                ->setVisibility(Mage_Catalog_Model_Product_Visibility::VISIBILITY_BOTH)
+                ->setPrice(10.00)
+                ->setDescription('This is a long description')
+                ->setShortDescription('This is a short description')
+                ->setStockData(array(
+                        'use_config_manage_stock' => 0,
+                        'manage_stock' => 1,
+                        'min_sale_qty' => 1,
+                        'max_sale_qty' => 2,
+                        'is_in_stock' => 1,
+                        'qty' => 999
+                    )
+                )
+                ->setCategoryIds(array($category->getId()))
+                ->save();
+        } catch (Exception $e) {
+            Mage::log($e->getMessage());
+        }
     }
 
     /**

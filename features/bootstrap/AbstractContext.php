@@ -1,22 +1,10 @@
 <?php
 
-use Behat\MinkExtension\Context\RawMinkContext;
-
 /**
  * Abstract context.
- * @method Behat\MinkExtension\Context\MinkContext getMainContext()
  */
-class AbstractContext extends RawMinkContext
+trait AbstractContext
 {
-    /**
-     * @param null $name
-     * @return Behat\Mink\Session
-     */
-    public function getSession($name = null)
-    {
-        return $this->getMainContext()->getSession($name);
-    }
-
     /**
      * @return Mage_Catalog_Model_Resource_Product_Collection
      */
@@ -40,51 +28,10 @@ class AbstractContext extends RawMinkContext
         $collection = $this->getBasicProductCollection();
         $collection->getSelect()->order(new Zend_Db_Expr('RAND()'));
 
-        if(!$collection->getSize()){
-            return $this->generateDummyProduct();
-        }
-
         return $collection->getFirstItem();
     }
 
-    public function generateDummyProduct($category = null)
-    {
-        Mage::app()->setCurrentStore(Mage_Core_Model_App::ADMIN_STORE_ID);
-        $product = Mage::getModel('catalog/product');
-        try {
-            $product->setWebsiteIds(array(1))
-                ->setAttributeSetId(4)
-                ->setTypeId('simple')
-                ->setCreatedAt(strtotime('now'))
-                ->setSku('dummy-product-' . rand(0, 1000))
-                ->setName('Dummy Product')
-                ->setWeight(4.0000)
-                ->setStatus(1)
-                ->setTaxClassId(0)
-                ->setVisibility(Mage_Catalog_Model_Product_Visibility::VISIBILITY_BOTH)
-                ->setPrice(10.00)
-                ->setDescription('This is a long description')
-                ->setShortDescription('This is a short description')
-                ->setStockData(array(
-                        'use_config_manage_stock' => 0,
-                        'manage_stock' => 1,
-                        'min_sale_qty' => 1,
-                        'max_sale_qty' => 2,
-                        'is_in_stock' => 1,
-                        'qty' => 999
-                    )
-                );
-
-                if($category) {
-                    $product->setCategoryIds(array($category->getId()));
-                }
-                $product->save();
-        } catch (Exception $e) {
-            Mage::log($e->getMessage());
-        }
-    }
-
-    public function getClassNameByTheme($key){
+    public function getClassNameByTheme($theme, $class){
         $rwd = array(
             'breadcrumbs' => '.breadcrumbs',
             'productNameOnCategoryPage' => 'h2.product-name a'
@@ -95,8 +42,19 @@ class AbstractContext extends RawMinkContext
             'productNameOnCategoryPage' => 'h2.product-title a'
         );
 
-        $theme = $this->getMainContext()->getParameter('theme') == 'rwd' ? $rwd : $other;
-        return $theme[$key];
+        $theme = $theme == 'rwd' ? $rwd : $other;
+        return $theme[$class];
+    }
+
+    public function onADecimalQtyProductPageToggle($toggle)
+    {
+        $depts = explode(',', \Mage::getStoreConfig('hickeys_swatch/general/departments'));
+        $collection = $this->getBasicProductCollection();
+        $collection->addAttributeToSelect('department');
+        $collection->addFieldToFilter('department', array($toggle => $depts));
+        $collection->getSelect()->order(new \Zend_Db_Expr('RAND()'));
+
+        $this->getSession()->visit($this->getMinkParameter('base_url') . 'catalog/product/view/id/' . $collection->getFirstItem()->getId());
     }
 
     /**
@@ -150,25 +108,54 @@ class AbstractContext extends RawMinkContext
     }
 
     /**
+     * @var $scope Behat\Behat\Hook\Scope\AfterScenarioScope
      * @AfterScenario
      */
-    public function takeScreenshotForFailedScenario($event)
+    public function takeScreenshotAfterFailedStep(Behat\Behat\Hook\Scope\AfterScenarioScope $scope)
     {
-        if ($event->getResult() === 4) {
-            Mage::log($event->getScenario()->getTitle(), null, 'behat.log', true);
-            //Mage::log($this->getSession()->getCurrentUrl(), null, 'behat.log', true);
+        if (99 === $scope->getTestResult()->getResultCode()) {
+            $this->takeScreenshot();
+        }
+    }
 
-            $driver = $this->getSession()->getDriver();
-            if (get_class($driver) == 'Behat\\Mink\\Driver\\Selenium2Driver') {
-                try{
-                    $path = Mage::getBaseDir() . '/var/behat/screenshots';
-                    $io = new Varien_Io_File();
-                    $io->checkAndCreateFolder($path);
-                    $date = date('Ymdhis');
-                    $this->saveScreenshot($date . '.png', $path);
-                }catch(Exception $e){
-                    Mage::log($e->getMessage(), null, 'behat.log', true);
-                }
+    private function takeScreenshot()
+    {
+        $driver = $this->getSession()->getDriver();
+        if (!$driver instanceof Behat\Mink\Driver\Selenium2Driver) {
+            return;
+        }
+        try{
+            $path = Mage::getBaseDir() . '/var/behat/screenshots';
+            $io = new Varien_Io_File();
+            $io->checkAndCreateFolder($path);
+            $date = date('Ymdhis');
+            $this->saveScreenshot($date . '.png', $path);
+        }catch(Exception $e){
+            Mage::log($e->getMessage(), null, 'behat.log', true);
+        }
+    }
+
+    /**
+     * @var $scope Behat\Testwork\Hook\Scope\AfterSuiteScope
+     * @AfterSuite
+     */
+    public static function sendEmailWithResults(Behat\Testwork\Hook\Scope\AfterSuiteScope $scope)
+    {
+        if (!$scope->getTestResult()->isPassed()){
+            $file = new Varien_Io_File();
+            $html = @$file->read(Mage::getBaseDir('var') . '/behat/results.html');
+
+            if ($html) {
+                ini_set('SMTP', Mage::getStoreConfig('system/smtp/host'));
+                ini_set('smtp_port', Mage::getStoreConfig('system/smtp/port'));
+
+                $mail = new Zend_Mail();
+                $mail->setFrom(Mage::getStoreConfig('qa/email/from_email'), Mage::getStoreConfig('qa/email/from_name'));
+                $mail->addTo(Mage::getStoreConfig('qa/email/to_email'), Mage::getStoreConfig('qa/email/to_name'));
+
+                $mail->setSubject('Behat Results');
+                $mail->setBodyHtml($html);
+                $mail->send();
             }
         }
     }

@@ -1,15 +1,17 @@
+@product
 Feature: Product Page
 
-  @product @javascript
-  Scenario: Product Page
+  Background:
     Given I am on a product page
+
+  @javascript
+  Scenario: Product Page
     Then I should see the product name
     And I should see the breadcrumbs
     When I click the add to cart button
     Then I should be on the cart page
     And I should see a success message
 
-  @product @prod
+  @prod
   Scenario: Valid Product Image
-    Given I am on a product page
-    And I should see a valid product image
+    Then I should see a valid product image

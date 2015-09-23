@@ -1,41 +1,93 @@
 default:
-    formatter:
-        name: progress
+    suites:
+      cart:
+          contexts:
+            - CartContext
+          filters:
+            tags: @cart
+      category:
+        contexts:
+          - CategoryContext:
+              theme: rwd
+        filters:
+          tags: @category
+      checkout:
+          contexts:
+            - CheckoutContext:
+                payment:
+                  method: checkmo
+          filters:
+            tags: @checkout
+      config:
+        contexts:
+          - ConfigContext
+        filters:
+          tags: @config
+      custom:
+        contexts:
+          - CustomContext
+        filters:
+          tags: @custom
+      customer:
+        contexts:
+          - CustomerContext
+        filters:
+          tags: @customer
+      email:
+        contexts:
+          - EmailsContext
+          - CustomContext
+        filters:
+          tags: @email
+      homepage:
+        contexts:
+          - HomepageContext
+        filters:
+          tags: @homepage
+      product:
+        contexts:
+          - ProductContext:
+              theme: rwd
+              image:
+                selector: '#image-main'
+        filters:
+          tags: @product
+      security:
+        contexts:
+          - SecurityContext
+        filters:
+          tags: @security
+      seo:
+        contexts:
+          - SeoContext
+        filters:
+          tags: @seo
+    gherkin:
+        filters:
+            tags: ~@disabled && ~@prod && ~@fixme
     extensions:
         MageTest\MagentoExtension\Extension: ~
-        StudioForty9\QA\Extension: ~
-        Behat\MinkExtension\Extension:
-            base_url: %magento.base_url%
+        Alex\MailCatcher\Behat\MailCatcherExtension\Extension:
+            url: http://localhost:1080
+            purge_before_scenario: true
+        Behat\MinkExtension:
+            base_url: http://magento.dev/
             goutte:
-                server_parameters:
-                    HTTP_HOST: %magento.base_url%
+                server_parameters: ~
             selenium2:
                 wd_host: "http://localhost:4444/wd/hub"
                 #wd_host: "http://localhost:8910/wd/hub"
                 browser: chrome
             default_session: goutte
             javascript_session: selenium2
-    filters:
-        tags: ~@disabled && ~@prod && ~@fixme
-    context:
-        parameters:
-            base_url: %magento.base_url%
-            # custom_contexts:
-            #   - customfeature1
-            #   - customfeature2
-            theme: rwd
-            payment:
-              method: checkmo
-            product:
-              image:
-                selector: '#image-main'
-
-prod:
-  extensions:
-    Behat\MinkExtension\Extension:
-      base_url: http://www.example.com/
-  filters:
-    tags: ~@disabled
-  context:
-    parameters:
-      base_url: http://www.example.com/
+        emuse\BehatHTMLFormatter\BehatHTMLFormatterExtension:
+              name: html
+              renderer: Twig,Behat2
+              file_name: results
+              print_args: true
+              print_outp: true
+              loop_break: true
+    formatters:
+        pretty:
+#        html:
+#          output_path: %paths.base%/var/behat/
