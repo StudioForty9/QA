@@ -15,6 +15,10 @@ Add the repository to your project `composer.json` file:
     	{
     	 	 "type": "vcs",
 	    	  "url": "http://github.com/studioforty9/qa"
+	    },
+	    {
+		      "url": "git@github.com:alexandresalome/mailcatcher.git",
+    		  "type": "git"
 	    }
 	]
 
@@ -23,9 +27,11 @@ Add the following to your project's `composer.json` file:
 	"require-dev": {
 	    "behat/mink-selenium2-driver": "*",
     	"magento-ecg/coding-standard": "dev-master",
-	    "magetest/magento-behat-extension": "dev-develop",
+		"magetest/magento-behat-extension": "dev-feature/Behat3",
     	"phpunit/phpunit": "*",
-	    "studioforty9/qa": "dev-master"
+	    "studioforty9/qa": "dev-master",
+	    "alexandresalome/mailcatcher": "dev-master",
+	    "emuse/behat-html-formatter": "0.1.*"
 	  },
 	  "config": {
     	"bin-dir": "bin"
@@ -52,23 +58,10 @@ Once the composer installation has completed, you should be able to run `./bin/b
 
 ##Notes
 
-###Custom Features
-To add tests for custom features, do the following:
-
-- Add the name of your custom feature to the `behat.yml` file:
-
-		custom_contexts:
-    		- customfeature1
-	        - customfeature2
-	        
-- Add a feature file under features/custom/ (e.g., `features/custom/customfeature1.feature`)
-- Add a custom context class under features/bootstrap/custom/ (e.g., `features/bootstrap/custom/Customfeature1.php`)
-
 ###Debugging
 - Screenshots of failed scenarios are saved to to `{magento_root}/var/behat/screenshots/`
 - Some information is logged to `{magento_root}/var/log/behat.log`
 - An email with the results can be sent out provided that
 	- The email recipient is set in the system configuration under System -> Configuration -> Advanced -> QA
-	- Behat is run using the following command: 
-	
-			./bin/behat --format=html --out=var/behat/results.html
+	- In `behat.yml` uncomment the html formatter
+	- **Currently not working**
