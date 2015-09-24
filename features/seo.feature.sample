@@ -1,10 +1,12 @@
 @seo
 Feature: SEO
 
+  @prod
   Scenario: robots.txt file exists
     Given I am on "/robots.txt"
     Then the response status code should be 200
 
+  @prod
   Scenario: robots.txt doesn't block CSS or JS
     Then "robots.txt" file should not contain ".css"
     And "robots.txt" file should not contain ".js"

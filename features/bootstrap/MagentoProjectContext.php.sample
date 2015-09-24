@@ -28,6 +28,12 @@ trait MagentoProjectContext
         //($this->find('css', '.add-to-cart-buttons button'));
 
         $this->pressButton($addToCartText);
+
+        if($this->_ajax){
+            sleep(2);
+            $this->visit($this->getMinkParameter('base_url') . 'checkout/cart/');
+        }
+
         PHPUnit_Framework_Assert::assertNotNull($this->getSession()->getPage()->find('xpath',
             '//*[@id="shopping-cart-totals-table"]'));
     }

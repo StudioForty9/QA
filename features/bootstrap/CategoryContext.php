@@ -11,8 +11,9 @@ class CategoryContext extends MinkContext
 
     protected $_category = null;
     protected $_theme = null;
+    protected $_productLinkCSS = null;
 
-    public function __construct($theme)
+    public function __construct($theme, $product_link_css = null)
     {
         $store = Mage::app()->getStore()->getId();
         $rootCategoryId = Mage::app()->getStore()->getRootCategoryId();
@@ -49,6 +50,7 @@ class CategoryContext extends MinkContext
 
         $this->_category = $collection->getFirstItem();
         $this->_theme = $theme;
+        $this->_productLinkCSS = $product_link_css;
     }
 
 
@@ -90,7 +92,9 @@ class CategoryContext extends MinkContext
      */
     public function iClickOnAProduct()
     {
-        $className = $this->getClassNameByTheme($this->_theme, 'productNameOnCategoryPage');
+
+        $className = $this->_productLinkCSS ?  $this->_productLinkCSS :
+            $this->getClassNameByTheme($this->_theme, 'productNameOnCategoryPage');
         $link = $this->getSession()->getPage()->find('css', $className);
         PHPUnit_Framework_Assert::assertNotNull($link);
         $this->getSession()->visit($link->getAttribute('href'));

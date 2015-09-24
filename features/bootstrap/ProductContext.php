@@ -52,7 +52,9 @@ class ProductContext extends MinkContext
      */
     public function iClickTheAddToCartButton()
     {
-        $this->getSession()->getDriver()->click('//button[@onclick="productAddToCartForm.submit(this)"]');
+        $element = $this->getSession()->getPage()->find('css', '.btn-cart');
+        $element->click();
+        //$this->getSession()->getDriver()->click('//button[@onclick="productAddToCartForm.submit(this)"]');
     }
 
     /**

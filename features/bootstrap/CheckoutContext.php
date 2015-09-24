@@ -12,9 +12,12 @@ class CheckoutContext extends MinkContext
     protected $_differentShippingAddress = false;
     protected $_payment = null;
 
-    public function __construct($payment)
+    protected $_ajax = null;
+
+    public function __construct($payment, $ajax = null)
     {
         $this->_payment = $payment;
+        $this->_ajax = $ajax;
     }
 
     /**

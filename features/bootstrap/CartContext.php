@@ -9,6 +9,12 @@ class CartContext extends MinkContext
 {
     use AbstractContext, MagentoProjectContext;
 
+    protected $_ajax = null;
+
+    public function __construct($ajax = false){
+        $this->_ajax = $ajax;
+    }
+
     /**
      * @When /^I change the Qty to (\d+)$/
      */
@@ -16,9 +22,8 @@ class CartContext extends MinkContext
     {
         $element = $this->getSession()->getPage()->find('css', '.qty');
 
-        $context = $this;
-        $context->fillField($element->getAttribute('name'), $arg1);
-        $context->pressButton('Update');
+        $this->fillField($element->getAttribute('name'), $arg1);
+        $this->pressButton('Update');
     }
 
     /**
@@ -65,9 +70,10 @@ class CartContext extends MinkContext
      */
     public function iApplyTheCouponCode($arg1)
     {
-        $context = $this;
-        $context->fillField('Discount Codes', $arg1);
-        $context->pressButton('Apply');
+        $this->fillField('coupon_code', $arg1);
+        $element = $this->getSession()->getPage()->find('xpath',
+            '//*[@id="discount-coupon-form"]/div/div/div[2]/button');
+        $element->press();
     }
 
     /**
