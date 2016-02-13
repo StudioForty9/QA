@@ -34,7 +34,10 @@ class SecurityContext extends MinkContext
      */
     public function wordpressIsInstalled()
     {
-        $this->visit($this->getMinkParameter('base_url') . 'wordpress');
+        $dir = Mage::getStoreConfig('wordpress/integration/path');
+        $dir = (! $dir) ? 'wordpress' : $dir;
+        $file = $dir . '/wp-login.php';
+        $this->visit($this->getMinkParameter('base_url') . $file);
         $this->assertResponseStatus(200);
     }
 
