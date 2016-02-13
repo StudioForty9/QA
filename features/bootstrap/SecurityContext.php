@@ -35,7 +35,7 @@ class SecurityContext extends MinkContext
     public function wordpressIsInstalled()
     {
         $dir = Mage::getStoreConfig('wordpress/integration/path');
-        $dir = (! $dir) ? 'wordpress' : $dir;
+        $dir = (!$dir) ? 'wordpress' : $dir;
         $file = $dir . '/wp-login.php';
         $this->visit($this->getMinkParameter('base_url') . $file);
         $this->assertResponseStatus(200);
@@ -57,6 +57,18 @@ class SecurityContext extends MinkContext
         $element = $this->find('xpath', '//*[@id="pagebody"]/div/div[1]/table[1]/tbody/tr[1]/td[1]');
         $latestVersion = $element->getText();
 
-        PHPUnit_Framework_Assert::assertEquals($version, $latestVersion, 'Latest Version of Wordpress (' . $latestVersion . ') is not installed');
+        PHPUnit_Framework_Assert::assertEquals(
+            $version, $latestVersion, 'Latest Version of Wordpress (' . $latestVersion . ') is not installed'
+        );
+    }
+
+    /**
+     * @When /^I go to Magereport$/
+     */
+    public function visitMageReport()
+    {
+        $url = $this->getMinkParameter('base_url');
+        $this->visit("https://www.magereport.com/scan/?s=$url");
+        sleep(7);
     }
 }

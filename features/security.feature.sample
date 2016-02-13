@@ -1,6 +1,11 @@
 @security
 Feature: Security
 
+  @javascript
+  Scenario: Check Magereport
+    When I go to Magereport
+    Then I should see text matching "low"
+
   Scenario: .htaccess
     When I am on "/app/etc/local.xml"
     Then the response status code should be 403
